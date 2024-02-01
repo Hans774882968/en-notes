@@ -62,7 +62,6 @@ module.exports = {
     }],
     'sort-keys-fix/sort-keys-fix': 'warn',
     'space-before-blocks': 'error',
-    'space-before-function-paren': ['error', 'never'],
     'space-infix-ops': ['error', { 'int32Hint': false }]
   }
 };

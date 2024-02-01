@@ -11,7 +11,7 @@ export const cnWord = sequelizeObject.define(
     word: {
       allowNull: false,
       primaryKey: true,
-      type: DataTypes.STRING(60),
+      type: DataTypes.STRING(100),
       unique: true
     }
   },

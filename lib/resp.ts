@@ -3,8 +3,8 @@ export type RetMsg = {
   retcode: number
   msg: string
 };
-export type Resp = RetMsg & {
-  data: Data
+export type Resp<T = Data> = RetMsg & {
+  data: T
 };
 
 export function suc(data: Data): Resp {

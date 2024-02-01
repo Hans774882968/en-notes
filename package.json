@@ -13,19 +13,29 @@
     "lint": "next lint --fix"
   },
   "dependencies": {
+    "@uiw/react-md-editor": "3.6.0",
     "ajv": "^8.12.0",
+    "antd": "^5.13.2",
+    "axios": "^1.6.7",
     "biguint-format": "^1.0.2",
     "date-fns": "^2.29.3",
+    "dompurify": "^3.0.8",
     "dotenv": "^16.4.1",
     "flake-idgen": "^1.4.0",
     "gray-matter": "^4.0.3",
     "jszip": "^3.10.1",
+    "marked": "^11.2.0",
     "mysql2": "^3.7.0",
     "next": "14.1.0",
     "next-connect": "^1.0.0",
+    "next-remove-imports": "^1.0.12",
     "react": "^18",
     "react-dom": "^18",
-    "sequelize": "^6.35.2"
+    "rehype-sanitize": "^6.0.0",
+    "sass": "^1.70.0",
+    "sequelize": "^6.35.2",
+    "swr": "^2.2.4",
+    "use-local-storage-state": "^19.1.0"
   },
   "devDependencies": {
     "@types/node": "^20",
