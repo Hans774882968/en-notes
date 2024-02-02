@@ -1,14 +1,16 @@
 import { KeyboardEvent, useState } from 'react';
-import { ThemeProvider } from '@/components/ThemeContext';
+import { Sentence, Word } from '@/db/models/types';
 import { isMac, isWindows } from '@/lib/frontend/get-platform';
 import AutoComplete from 'antd/lib/auto-complete';
 import Button from 'antd/lib/button';
+import EnLayout from '@/components/EnLayout';
 import Form from 'antd/lib/form';
-import MarkdownEditor from './MarkdownEditor';
+import MarkdownEditor from '@/components/MarkdownEditor';
 import Message from 'antd/lib/message';
-import Navbar from '@/components/Navbar';
+import QuestionCircleOutlined from '@ant-design/icons/QuestionCircleOutlined';
 import Request from '@/lib/frontend/request';
-import styles from './word.module.sass';
+import Tooltip from 'antd/lib/tooltip';
+import styles from './word.module.scss';
 
 const formLayout = {
   labelCol: { span: 3 },
@@ -25,7 +27,7 @@ const UPDATE_WORD = 3;
 type State = typeof SEARCH_WORD | typeof CREATE_WORD | typeof UPDATE_WORD;
 const stateToText: Record<State, string> = {
   [CREATE_WORD]: 'Create Word',
-  [SEARCH_WORD]: 'Search Word (Please start by searching a word)',
+  [SEARCH_WORD]: 'Search Word',
   [UPDATE_WORD]: 'Update Word'
 };
 
@@ -35,13 +37,6 @@ type EditWordForm = {
 
 const rules = {
   note: [{ message: 'note should not be empty', required: true }]
-};
-
-type Word = {
-  word: string
-  note: string
-  ctime: string
-  mtime: string
 };
 
 type WordSearchRes = {
@@ -60,6 +55,8 @@ type UpsertWordRes = {
 export default function WordPage() {
   const [wordSearchKey, setWordSearchKey] = useState('');
   const [currentState, setCurrentState] = useState<State>(SEARCH_WORD);
+  const [synonymsText, setSynonymsText] = useState('');
+  const [sentences, setSentences] = useState<Sentence[]>([]);
   const [createTime, setCreateTime] = useState('');
   const [modifyTime, setModifyTime] = useState('');
 
@@ -75,7 +72,7 @@ export default function WordPage() {
   const shouldShowNoteField = currentState !== SEARCH_WORD;
   const canNotSubmit = currentState === SEARCH_WORD || !noteFieldValue || isSubmitting;
 
-  const preventAutoSubmit = (e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const preventAccidentSubmit = (e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (e.key === 'Enter') e.preventDefault();
   };
 
@@ -120,6 +117,8 @@ export default function WordPage() {
       return;
     }
     setCurrentState(UPDATE_WORD);
+    setSynonymsText(word.itsSynonyms.map(({ word }) => word).join('; '));
+    setSentences(word.sentences);
     setCreateTime(word.ctime);
     setModifyTime(word.mtime);
     editWordForm.setFieldValue('note', word.note);
@@ -159,10 +158,24 @@ export default function WordPage() {
     editWordForm.setFieldValue('note', cleanedNote);
   };
 
-  return (
-    <ThemeProvider>
-      <Navbar />
+  const modeIntro = (
+    <>
+      <span>Search Word: Please start by searching a word</span><br />
+      <span>Create Word: word record is not found, your action will create a new word</span><br />
+      <span>Update Word: your action will update existing word</span>
+    </>
+  );
+  const modeToolTip = (
+    <>
+      <Tooltip placement="top" title={modeIntro}>
+        <QuestionCircleOutlined className={styles.formTooltipIcon} />
+      </Tooltip>
+      Mode
+    </>
+  );
 
+  return (
+    <EnLayout>
       <div className={styles.word}>
         <Form
           {...formLayout}
@@ -172,7 +185,7 @@ export default function WordPage() {
           onFinish={onFinish}
           autoComplete="off"
         >
-          <Form.Item label="Mode">
+          <Form.Item label={modeToolTip}>
             <span>{stateToText[currentState]}</span>
           </Form.Item>
 
@@ -184,9 +197,37 @@ export default function WordPage() {
               onChange={handleWordChange}
               onSearch={handleWordSearch}
               onBlur={getWord}
-              onInputKeyDown={(e) => preventAutoSubmit(e)}
+              onInputKeyDown={(e) => preventAccidentSubmit(e)}
             />
           </Form.Item>
+
+          {
+            (currentState === UPDATE_WORD) && (
+              <Form.Item label="Synonyms">
+                <span>{synonymsText || 'No synonyms recorded yet'}</span>
+              </Form.Item>
+            )
+          }
+
+          {
+            (currentState === UPDATE_WORD) && (
+              <Form.Item label="Sentences">
+                {
+                  !sentences.length ? <span>No sentences recorded yet</span> : (
+                    <ol className={styles.sentences}>
+                      {
+                        sentences.map(({ sentence }) => {
+                          return (
+                            <li key={sentence}>{sentence}</li>
+                          );
+                        })
+                      }
+                    </ol>
+                  )
+                }
+              </Form.Item>
+            )
+          }
 
           {
             (currentState === UPDATE_WORD) && (
@@ -225,12 +266,14 @@ export default function WordPage() {
 
             {
               shouldShowNoteField && (
-                <Button className={styles.btn} onClick={cleanNote}>Clean Note</Button>
+                <Button className={styles.btn} onClick={cleanNote}>
+                  Clean Note
+                </Button>
               )
             }
           </Form.Item>
         </Form>
       </div>
-    </ThemeProvider>
+    </EnLayout>
   );
 }

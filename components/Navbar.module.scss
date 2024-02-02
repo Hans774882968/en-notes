@@ -1,0 +1,38 @@
+@import '../styles/theme.scss';
+
+.navbar {
+  $navbar-padding-top: 12px;
+  $navbar-padding-left: 20px;
+  $plugin-icon-height: 48px;
+
+  position: relative; // 为了使阴影呈现在左侧菜单和右侧 pageContainer 上面
+  padding: $navbar-padding-top $navbar-padding-left;
+  min-height: 2 * $navbar-padding-top + $plugin-icon-height;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%), 0 1px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px 0 rgb(0 0 0 / 10%);
+  transition: background-color .3s;
+  box-sizing: border-box;
+
+  @include useTheme {
+    background-color: getThemeVar('navBarBgColor')
+  }
+
+  .navbarCol {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .pluginName {
+    font-size: 18px;
+    font-weight: bold;
+    transition: color .3s;
+
+    @include useTheme {
+      color: getThemeVar('textColor')
+    }
+  }
+
+  .selectLang {
+    min-width: 100px;
+  }
+}

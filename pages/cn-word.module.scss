@@ -1,0 +1,17 @@
+@import '../styles/theme.scss';
+
+.word {
+  padding-top: 16px;
+
+  @include useTheme {
+    background-color: getThemeVar('pageContainerBgColor')
+  }
+
+  .formTooltipIcon {
+    margin: 0 8px
+  }
+
+  .btn {
+    margin-right: 8px
+  }
+}

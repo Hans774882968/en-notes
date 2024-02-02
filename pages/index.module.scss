@@ -1,0 +1,7 @@
+@import '../styles/theme.scss';
+
+.index {
+  @include useTheme {
+    color: getThemeVar('textColor')
+  }
+}

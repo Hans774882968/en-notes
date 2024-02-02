@@ -4,16 +4,16 @@ import theme from 'antd/lib/theme';
 import useLocalStorageState from 'use-local-storage-state';
 
 type ContextType = {
-  curClassNamePrefix: ThemeClassNamePrefix,
   preferDarkTheme: boolean,
-  setPreferDarkTheme(preferDarkTheme: boolean): void
+  preferDarkThemeSetter(preferDarkTheme: boolean): void,
+  mdEditorThemeName: MdEditorThemeName,
 } | null;
 
 const ThemeContext = createContext<ContextType>(null);
 
-export enum ThemeClassNamePrefix {
-  DARK = 'custom-theme-dark',
-  DEFAULT = 'custom-theme-default'
+enum MdEditorThemeName {
+  DARK = 'dark',
+  DEFAULT = 'light'
 }
 
 interface Props {
@@ -28,12 +28,21 @@ export const ThemeProvider: React.FC<Props> = (props) => {
   const antdCurrentTheme = {
     algorithm: preferDarkTheme ? theme.darkAlgorithm : theme.defaultAlgorithm
   };
-  const curClassNamePrefix = preferDarkTheme ? ThemeClassNamePrefix.DARK : ThemeClassNamePrefix.DEFAULT;
+  const mdEditorThemeName = preferDarkTheme ? MdEditorThemeName.DARK : MdEditorThemeName.DEFAULT;
+
+  const preferDarkThemeSetter = (newPreferDarkTheme: boolean) => {
+    setPreferDarkTheme(newPreferDarkTheme);
+    document.documentElement.setAttribute('data-color-mode', newPreferDarkTheme ? MdEditorThemeName.DARK : MdEditorThemeName.DEFAULT);
+  };
 
   return (
     <ConfigProvider theme={antdCurrentTheme}>
       <ThemeContext.Provider
-        value={{ curClassNamePrefix, preferDarkTheme, setPreferDarkTheme }}
+        value={{
+          mdEditorThemeName,
+          preferDarkTheme,
+          preferDarkThemeSetter
+        }}
       >
         {children}
       </ThemeContext.Provider>

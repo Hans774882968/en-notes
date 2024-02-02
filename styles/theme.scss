@@ -1,0 +1,27 @@
+$themes: (
+  light: (textColor: black,
+    navBarBgColor: #f5f5f5,
+    pageContainerBgColor: #f5f5f5,
+  ),
+  dark: (textColor: rgb(255 255 255 / 85%),
+    navBarBgColor: #161b22,
+    pageContainerBgColor: black,
+  )
+);
+
+$curTheme: 'light';
+
+@mixin useTheme() {
+  @each $key, $value in $themes {
+    $curTheme: $key !global;
+
+    html[data-color-mode='#{$key}'] & {
+      @content;
+    }
+  }
+}
+
+@function getThemeVar($param) {
+  $themeMap: map-get($themes, $curTheme);
+  @return map-get($themeMap, $param);
+}
