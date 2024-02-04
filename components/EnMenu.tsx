@@ -27,13 +27,16 @@ function getItem(
 
 const items: MenuProps['items'] = [
   getItem('Word', '1-1', <AppstoreOutlined />, [
-    getItem('Edit Word', '/word', <EditOutlined />),
-    getItem('Word Settings', '2-2', <SettingOutlined />)
+    getItem('Edit', '/word', <EditOutlined />),
+    getItem('Word Settings', '/word-settings', <SettingOutlined />)
   ]),
   getItem('English Topic', '/cn-word', <EditOutlined />),
-  getItem('Sentence', '1-3', <EditOutlined />),
-  getItem('Export', '1-4', <ExportOutlined />),
-  getItem('Dashboard', '1-5', <DashboardOutlined />)
+  getItem('Sentence', '1-3', <AppstoreOutlined />, [
+    getItem('Create', '/sentence/create', <EditOutlined />),
+    getItem('Edit', '/sentence/edit', <EditOutlined />)
+  ]),
+  getItem('Export', '/export', <ExportOutlined />),
+  getItem('Dashboard', '/dashboard', <DashboardOutlined />)
 ];
 
 function collectAllKeys(currentItems: MenuProps['items'], a: string[]) {

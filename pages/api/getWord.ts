@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Resp, suc } from '../../lib/resp';
+import { Resp, suc } from '@/lib/resp';
 import { createRouter } from 'next-connect';
-import { sentence, word } from '../../db/models';
+import { sentence, word } from '@/db/models';
 
 const router = createRouter<NextApiRequest, NextApiResponse<Resp>>();
 

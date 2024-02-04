@@ -4,7 +4,7 @@ import {
   SYNONYMS_MD,
   WORDS_MD,
   WORD_SENTENCES_MD
-} from '../../lib/const';
+} from '@/lib/const';
 import {
   cnWord,
   sentence,

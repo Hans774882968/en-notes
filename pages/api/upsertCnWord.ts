@@ -1,16 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { UPSERT_CN_WORD_EXCEPTION } from '../../lib/retcode';
-import { cnWord } from '../../db/models';
+import { UPSERT_CN_WORD_EXCEPTION } from '@/lib/retcode';
+import { UpsertCnWordParams } from '@/lib/backend/paramAndResp';
+import { cnWord } from '@/db/models';
 import { createRouter } from 'next-connect';
-import { upsertWordRecord } from '../../lib/apiUtils';
-import { validateReq } from '../../middlewares/validateReq';
+import { upsertWordRecord } from '@/lib/backend/apiUtils';
+import { validateReq } from '@/middlewares/validateReq';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
-
-interface UpsertCnWordParams {
-  note: string
-  word: string
-}
 
 router.post(
   validateReq<UpsertCnWordParams>({

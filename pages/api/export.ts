@@ -7,7 +7,8 @@ import {
   SYNONYMS_MD,
   WORDS_MD,
   WORD_SENTENCES_MD
-} from '../../lib/const';
+} from '@/lib/const';
+import { ExportParams } from '@/lib/backend/paramAndResp';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import {
@@ -17,15 +18,16 @@ import {
   getSeparateSynonymsMdStr,
   getSeparateWordSentencesMdStr,
   getSeparateWordsMdStr
-} from '../../db/db2Md';
-import { validateReq } from '../../middlewares/validateReq';
+} from '@/db/db2Md';
+import { validateReq } from '@/middlewares/validateReq';
 import JSZip from 'jszip';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
-interface ExportParams {
-  junctionTables?: string
-  separate?: string
+function setHeaders(res: NextApiResponse, fileName: string) {
+  res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+  res.setHeader('Content-Type', 'application/octet-stream');
+  res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
 }
 
 router.get(
@@ -47,8 +49,7 @@ router.get(
 
     if (!separate) {
       const mdContent = await getMergedMdStr(junctionTables);
-      res.setHeader('Content-Disposition', `attachment; filename=${MERGED_MD_NAME}`);
-      res.setHeader('Content-Type', 'application/octet-stream');
+      setHeaders(res, MERGED_MD_NAME);
       res.end(mdContent);
       return;
     }
@@ -67,8 +68,7 @@ router.get(
       const synonymsMdStr = await getSeparateSynonymsMdStr();
       rootFolder?.file(SYNONYMS_MD, synonymsMdStr);
     }
-    res.setHeader('Content-Disposition', `attachment; filename=${SEPARATE_FILES_ZIP_NAME}`);
-    res.setHeader('Content-Type', 'application/octet-stream');
+    setHeaders(res, SEPARATE_FILES_ZIP_NAME);
     zip.generateNodeStream({ streamFiles: true, type: 'nodebuffer' }).pipe(res);
   }
 );

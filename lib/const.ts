@@ -6,3 +6,12 @@ export const CN_WORDS_MD = 'cnWords.md';
 export const SENTENCES_MD = 'sentences.md';
 export const WORD_SENTENCES_MD = 'wordSentences.md';
 export const SYNONYMS_MD = 'synonyms.md';
+
+export const formLayout = {
+  labelCol: { span: 3 },
+  wrapperCol: { span: 19 }
+};
+
+export const btnLayout = {
+  wrapperCol: { offset: 3, span: 19 }
+};

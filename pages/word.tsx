@@ -1,5 +1,7 @@
+import { GetWordResp, UpsertWordResp, WordSearchResp } from '@/lib/backend/paramAndResp';
 import { KeyboardEvent, useState } from 'react';
 import { Sentence, Word } from '@/db/models/types';
+import { btnLayout, formLayout } from '@/lib/const';
 import { isMac, isWindows } from '@/lib/frontend/get-platform';
 import AutoComplete from 'antd/lib/auto-complete';
 import Button from 'antd/lib/button';
@@ -11,25 +13,7 @@ import QuestionCircleOutlined from '@ant-design/icons/QuestionCircleOutlined';
 import Request from '@/lib/frontend/request';
 import Tooltip from 'antd/lib/tooltip';
 import styles from './word.module.scss';
-
-const formLayout = {
-  labelCol: { span: 3 },
-  wrapperCol: { span: 19 }
-};
-
-const btnLayout = {
-  wrapperCol: { offset: 3, span: 19 }
-};
-
-const SEARCH_WORD = 1;
-const CREATE_WORD = 2;
-const UPDATE_WORD = 3;
-type State = typeof SEARCH_WORD | typeof CREATE_WORD | typeof UPDATE_WORD;
-const stateToText: Record<State, string> = {
-  [CREATE_WORD]: 'Create Word',
-  [SEARCH_WORD]: 'Search Word',
-  [UPDATE_WORD]: 'Update Word'
-};
+import useCreateUpdateInOne from '@/lib/frontend/hooks/useCreateUpdateInOne';
 
 type EditWordForm = {
   note: string
@@ -39,28 +23,89 @@ const rules = {
   note: [{ message: 'note should not be empty', required: true }]
 };
 
-type WordSearchRes = {
-  result: Word[]
-};
+function ModeField({ stateText }: { stateText: string }) {
+  const modeIntro = (
+    <>
+      <span>Search Word: Please start by searching a word</span><br />
+      <span>Create Word: word record is not found, your action will create a new word</span><br />
+      <span>Update Word: your action will update existing word</span>
+    </>
+  );
+  const modeToolTip = (
+    <>
+      <Tooltip placement="top" title={modeIntro}>
+        <QuestionCircleOutlined className={styles.formTooltipIcon} />
+      </Tooltip>
+      Mode
+    </>
+  );
+  return (
+    <Form.Item label={modeToolTip}>
+      <span>{stateText}</span>
+    </Form.Item>
+  );
+}
 
-type GetWordRes = {
-  word: Word | null
-};
+function Sentences({ sentences }: { sentences: Sentence[] }) {
+  return (
+    <Form.Item label="Sentences">
+      {
+        !sentences.length ? <span>No sentences recorded yet</span> : (
+          <ol className={styles.sentences}>
+            {
+              sentences.map(({ sentence }) => {
+                return (
+                  <li key={sentence}>{sentence}</li>
+                );
+              })
+            }
+          </ol>
+        )
+      }
+    </Form.Item>
+  );
+}
 
-type UpsertWordRes = {
-  created: boolean
-  word?: Word
-};
+function WordReadOnlyInfo({ synonymsText, sentences, createTime, modifyTime }: {
+  synonymsText: string,
+  sentences: Sentence[],
+  createTime: string,
+  modifyTime: string
+}) {
+  return (
+    <>
+      <Form.Item label="Synonyms">
+        <span>{synonymsText || 'No synonyms recorded yet'}</span>
+      </Form.Item>
+      <Sentences sentences={sentences} />
+      <Form.Item label="Create Time">
+        <span>{createTime}</span>
+      </Form.Item>
+      <Form.Item label="Modify Time">
+        <span>{modifyTime}</span>
+      </Form.Item>
+    </>
+  );
+}
 
 export default function WordPage() {
+  const {
+    isSearchWordState,
+    isUpdateWordState,
+    changeToCreateWordState,
+    changeToSearchWordState,
+    changeToUpdateWordState,
+    stateText
+  } = useCreateUpdateInOne();
+
   const [wordSearchKey, setWordSearchKey] = useState('');
-  const [currentState, setCurrentState] = useState<State>(SEARCH_WORD);
   const [synonymsText, setSynonymsText] = useState('');
   const [sentences, setSentences] = useState<Sentence[]>([]);
   const [createTime, setCreateTime] = useState('');
   const [modifyTime, setModifyTime] = useState('');
 
   const [searchResult, setSearchResult] = useState<Word[]>([]);
+  const searchResultOptions = searchResult.map((wd) => ({ label: wd.word, value: wd.word }));
 
   const [editWordForm] = Form.useForm<EditWordForm>();
   const noteFieldValue = Form.useWatch('note', editWordForm);
@@ -69,8 +114,8 @@ export default function WordPage() {
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const shouldShowNoteField = currentState !== SEARCH_WORD;
-  const canNotSubmit = currentState === SEARCH_WORD || !noteFieldValue || isSubmitting;
+  const shouldShowNoteField = !isSearchWordState;
+  const canNotSubmit = isSearchWordState || !noteFieldValue || isSubmitting;
 
   const preventAccidentSubmit = (e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (e.key === 'Enter') e.preventDefault();
@@ -82,7 +127,7 @@ export default function WordPage() {
 
   const handleWordSearch = async (newWord: string) => {
     try {
-      const { result } = await Request.get<WordSearchRes>({ params: { search: newWord }, url: '/api/word/search' });
+      const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
       setSearchResult(result);
     } catch (e) {
       return;
@@ -96,27 +141,27 @@ export default function WordPage() {
   };
 
   const getWord = async () => {
-    setCurrentState(SEARCH_WORD);
+    changeToSearchWordState();
     if (!wordSearchKey) {
       clearFieldsExceptWordKey();
       return;
     }
     let word: Word | null = null;
     try {
-      const getWordRes = await Request.get<GetWordRes>({ params: { word: wordSearchKey }, url: '/api/getWord' });
+      const getWordRes = await Request.get<GetWordResp>({ params: { word: wordSearchKey }, url: '/api/getWord' });
       word = getWordRes.word;
     } catch (e) {
       Message.error({ content: 'get word info failed' });
       clearFieldsExceptWordKey();
-      setCurrentState(SEARCH_WORD);
+      changeToSearchWordState();
       return;
     }
     if (!word) {
       clearFieldsExceptWordKey();
-      setCurrentState(CREATE_WORD);
+      changeToCreateWordState();
       return;
     }
-    setCurrentState(UPDATE_WORD);
+    changeToUpdateWordState();
     setSynonymsText(word.itsSynonyms.map(({ word }) => word).join('; '));
     setSentences(word.sentences);
     setCreateTime(word.ctime);
@@ -138,7 +183,7 @@ export default function WordPage() {
     };
     setIsSubmitting(true);
     try {
-      const { created } = await Request.post<UpsertWordRes>({
+      const { created } = await Request.post<UpsertWordResp>({
         data: upsertWordParams,
         url: '/api/upsertWord'
       });
@@ -158,22 +203,6 @@ export default function WordPage() {
     editWordForm.setFieldValue('note', cleanedNote);
   };
 
-  const modeIntro = (
-    <>
-      <span>Search Word: Please start by searching a word</span><br />
-      <span>Create Word: word record is not found, your action will create a new word</span><br />
-      <span>Update Word: your action will update existing word</span>
-    </>
-  );
-  const modeToolTip = (
-    <>
-      <Tooltip placement="top" title={modeIntro}>
-        <QuestionCircleOutlined className={styles.formTooltipIcon} />
-      </Tooltip>
-      Mode
-    </>
-  );
-
   return (
     <EnLayout>
       <div className={styles.word}>
@@ -185,15 +214,13 @@ export default function WordPage() {
           onFinish={onFinish}
           autoComplete="off"
         >
-          <Form.Item label={modeToolTip}>
-            <span>{stateToText[currentState]}</span>
-          </Form.Item>
+          <ModeField stateText={stateText} />
 
           <Form.Item label="Word">
             <AutoComplete
               autoFocus
               placeholder="Search word"
-              options={searchResult.map((wd) => ({ label: wd.word, value: wd.word }))}
+              options={searchResultOptions}
               onChange={handleWordChange}
               onSearch={handleWordSearch}
               onBlur={getWord}
@@ -202,46 +229,13 @@ export default function WordPage() {
           </Form.Item>
 
           {
-            (currentState === UPDATE_WORD) && (
-              <Form.Item label="Synonyms">
-                <span>{synonymsText || 'No synonyms recorded yet'}</span>
-              </Form.Item>
-            )
-          }
-
-          {
-            (currentState === UPDATE_WORD) && (
-              <Form.Item label="Sentences">
-                {
-                  !sentences.length ? <span>No sentences recorded yet</span> : (
-                    <ol className={styles.sentences}>
-                      {
-                        sentences.map(({ sentence }) => {
-                          return (
-                            <li key={sentence}>{sentence}</li>
-                          );
-                        })
-                      }
-                    </ol>
-                  )
-                }
-              </Form.Item>
-            )
-          }
-
-          {
-            (currentState === UPDATE_WORD) && (
-              <Form.Item label="Create Time">
-                <span>{createTime}</span>
-              </Form.Item>
-            )
-          }
-
-          {
-            (currentState === UPDATE_WORD) && (
-              <Form.Item label="Modify Time">
-                <span>{modifyTime}</span>
-              </Form.Item>
+            isUpdateWordState && (
+              <WordReadOnlyInfo
+                createTime={createTime}
+                modifyTime={modifyTime}
+                sentences={sentences}
+                synonymsText={synonymsText}
+              />
             )
           }
 

@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Resp, suc } from '../../lib/resp';
-import { cnWord } from '../../db/models';
+import { Resp, suc } from '@/lib/resp';
+import { cnWord } from '@/db/models';
 import { createRouter } from 'next-connect';
-import { randomRecord } from '../../lib/apiUtils';
+import { randomRecord } from '@/lib/backend/apiUtils';
 
 const router = createRouter<NextApiRequest, NextApiResponse<Resp>>();
 

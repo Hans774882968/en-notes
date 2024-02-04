@@ -1,17 +1,13 @@
-import { ADD_WORD_SYNONYM_EXCEPTION, WORD_NOT_FOUND } from '../../lib/retcode';
+import { ADD_WORD_SYNONYM_EXCEPTION, LHS_RHS_SHOULD_NOT_EQUAL, WORD_NOT_FOUND } from '@/lib/retcode';
+import { AddWordSynonymParams } from '@/lib/backend/paramAndResp';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
-import { enWordRegex } from '../../db/const';
-import { fail, suc } from '../../lib/resp';
-import { synonym, word } from '../../db/models';
-import { validateReq } from '../../middlewares/validateReq';
+import { enWordRegex } from '@/db/const';
+import { fail, suc } from '@/lib/resp';
+import { synonym, word } from '@/db/models';
+import { validateReq } from '@/middlewares/validateReq';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
-
-interface AddWordSynonymParams {
-  lhs: string
-  rhs: string
-}
 
 router.post(
   validateReq<AddWordSynonymParams> ({
@@ -38,6 +34,11 @@ router.post(
     let { lhs, rhs } = req.body;
     lhs = lhs.trim().toLowerCase();
     rhs = rhs.trim().toLowerCase();
+
+    if (lhs === rhs) {
+      res.status(200).json(fail(LHS_RHS_SHOULD_NOT_EQUAL(lhs)));
+      return;
+    }
 
     const lhsRecord = await word.findByPk(lhs);
     if (!lhsRecord) {

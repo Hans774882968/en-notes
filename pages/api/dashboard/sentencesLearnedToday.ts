@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Resp } from '@/lib/resp';
 import { createRouter } from 'next-connect';
-import { getTodayRecords } from '@/lib/apiUtils';
+import { getTodayRecords } from '@/lib/backend/apiUtils';
 import { sentence } from '@/db/models';
 import { suc } from '@/lib/resp';
 

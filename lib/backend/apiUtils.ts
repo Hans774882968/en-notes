@@ -1,6 +1,8 @@
-import { Model, ModelStatic, Op, Sequelize } from 'sequelize';
+import { Model, ModelStatic, Op, Sequelize, col, fn, literal } from 'sequelize';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { RetMsg, fail, suc } from './resp';
+import { RetMsg, fail, suc } from '../resp';
+import { modelCountThisMonth } from './paramAndResp';
+import dayjs from 'dayjs';
 
 export async function randomRecord(
   req: NextApiRequest,
@@ -52,8 +54,31 @@ export function getTodayRecords(model: ModelStatic<Model>) {
   return model.findAll({
     where: {
       ctime: {
-        [Op.gt]: new Date(new Date() as any - 86400000)
+        [Op.gte]: new Date(new Date() as any - 86400000)
       }
     }
   });
+}
+
+export async function getThisMonthRecordCount(model: ModelStatic<Model>): Promise<modelCountThisMonth> {
+  const now = new Date();
+  const startDate = dayjs(now).subtract(30, 'day').toDate();
+  const queryResult = await model.count({
+    attributes: [
+      [literal('DATE(ctime)'), 'date'],
+      [literal('COUNT(*)'), 'count']
+    ],
+    group: ['date'],
+    where: {
+      ctime: {
+        [Op.gte]: startDate,
+        [Op.lt]: now
+      }
+    }
+  });
+  const total = queryResult.reduce((tot, item) => tot + item.count, 0);
+  return {
+    result: queryResult,
+    total
+  };
 }

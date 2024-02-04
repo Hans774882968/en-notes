@@ -1,0 +1,9 @@
+.editor {
+
+  :global(.w-md-editor-text-pre),
+  :global(.w-md-editor-text-pre > code),
+  :global(.w-md-editor-text-input) {
+    font-size: 20px !important;
+    line-height: 20px !important;
+  }
+}

@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { SearchParams } from '@/lib/backend/paramAndResp';
+import { cnWord } from '@/db/models';
 import { createRouter } from 'next-connect';
 import { isSubSequence } from '@/lib/backend/utils';
 import { suc } from '@/lib/resp';
 import { validateReq } from '@/middlewares/validateReq';
-import { word } from '@/db/models';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
@@ -24,13 +24,13 @@ router.get(
   async(req, res) => {
     const { search } = req.query;
     if (!search) {
-      const someWords = await word.findAll({
+      const someWords = await cnWord.findAll({
         limit: 50
       });
       res.status(200).json(suc({ result: someWords }));
       return;
     }
-    const allWords = await word.findAll();
+    const allWords = await cnWord.findAll();
     const searchResult = allWords.filter((wd) => {
       return isSubSequence(wd.getDataValue('word'), search as any);
     });

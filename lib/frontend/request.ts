@@ -1,5 +1,7 @@
+import { Resp } from '../resp';
 import Message from 'antd/lib/message';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import fileDownload from 'js-file-download';
 
 axios.interceptors.request.use(
   (config) => {
@@ -12,13 +14,14 @@ axios.interceptors.request.use(
 );
 
 export default class Request {
-  static get<T = any>({ url, params = {}}: { url: string, params?: Record<string, any> }):
-    Promise<T> {
-    return new Promise((resolve, reject) => {
-      axios.get(url, {
-        params
-      }).then(res => {
-        resolve(res?.data?.data);
+  static axiosObjectResolver<T>(axiosObject: Promise<AxiosResponse<Resp<T>, any>>) {
+    return new Promise<T>((resolve, reject) => {
+      axiosObject.then(res => {
+        const resp = res?.data;
+        if (!resp || resp?.retcode) {
+          throw new Error(resp?.msg || '');
+        }
+        resolve(resp?.data);
       }).catch(err => {
         const content = err.message || 'request error';
         console.error(content, err);
@@ -30,23 +33,54 @@ export default class Request {
     });
   }
 
-  static post<T = any>({ url, data }: { url: string, data: Record<string, any> }):
-    Promise<T> {
-    return new Promise((resolve, reject) => {
+  static get<T = any>({ url, params = {}}: { url: string, params?: Record<string, any> }) {
+    return this.axiosObjectResolver<T>(
+      axios.get(url, {
+        params
+      })
+    );
+  }
+
+  static post<T = any>({ url, data }: { url: string, data: Record<string, any> }) {
+    return this.axiosObjectResolver<T>(
       axios({
         data,
         method: 'post',
         url
-      }).then(res => {
-        resolve(res?.data?.data);
-      }).catch(err => {
-        const content = err.message || 'request error';
-        console.error(content, err);
-        Message.error({
-          content
-        });
-        reject(err);
+      })
+    );
+  }
+
+  static downloadAxiosObjResolver(axiosObject: Promise<AxiosResponse>) {
+    return axiosObject.then((resp) => {
+      const contentDisposition = resp.headers['content-disposition'];
+      const fileName = contentDisposition.substring(contentDisposition.indexOf('filename=') + 9);
+      fileDownload(resp.data, fileName);
+    }).catch(err => {
+      const content = err.message || 'request error';
+      console.error(content, err);
+      Message.error({
+        content
       });
     });
+  }
+
+  static downloadGet({ url, params = {}}: { url: string, params?: Record<string, any> }) {
+    return this.downloadAxiosObjResolver(
+      axios.get(url, {
+        params,
+        responseType: 'blob'
+      })
+    );
+  }
+
+  static downloadPost({ url, data }: { url: string, data: Record<string, any> }) {
+    return this.downloadAxiosObjResolver(
+      axios({
+        data,
+        method: 'post',
+        url
+      })
+    );
   }
 }

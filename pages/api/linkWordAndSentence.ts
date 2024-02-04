@@ -1,18 +1,14 @@
-import { LINK_WORD_SENTENCE_EXCEPTION, SENTENCE_NOT_FOUND, WORD_NOT_FOUND } from '../../lib/retcode';
+import { LINK_WORD_SENTENCE_EXCEPTION, SENTENCE_NOT_FOUND, WORD_NOT_FOUND } from '@/lib/retcode';
+import { LinkWordAndSentenceParams } from '@/lib/backend/paramAndResp';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
-import { enWordRegex } from '../../db/const';
-import { fail, suc } from '../../lib/resp';
+import { enWordRegex } from '@/db/const';
+import { fail, suc } from '@/lib/resp';
 import { isLegalSentenceId } from '@/db/models/sentence';
-import { sentence, word, wordSentence } from '../../db/models';
-import { validateReq } from '../../middlewares/validateReq';
+import { sentence, word, wordSentence } from '@/db/models';
+import { validateReq } from '@/middlewares/validateReq';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
-
-interface LinkWordAndSentenceParams {
-  sentenceId: string
-  word: string
-}
 
 router.post(
   validateReq<LinkWordAndSentenceParams>({

@@ -1,17 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { UPSERT_WORD_EXCEPTION } from '../../lib/retcode';
+import { UPSERT_WORD_EXCEPTION } from '@/lib/retcode';
+import { UpsertWordParams } from '@/lib/backend/paramAndResp';
 import { createRouter } from 'next-connect';
-import { enWordRegex } from '../../db/const';
-import { upsertWordRecord } from '../../lib/apiUtils';
-import { validateReq } from '../../middlewares/validateReq';
-import { word } from '../../db/models';
+import { enWordRegex } from '@/db/const';
+import { upsertWordRecord } from '@/lib/backend/apiUtils';
+import { validateReq } from '@/middlewares/validateReq';
+import { word } from '@/db/models';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
-
-interface UpsertWordParams {
-  note: string
-  word: string
-}
 
 router.post(
   validateReq<UpsertWordParams>({

@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { Resp, suc } from '@/lib/resp';
 import { cnWord } from '@/db/models';
 import { createRouter } from 'next-connect';
-import { getTodayRecords } from '@/lib/apiUtils';
+import { getTodayRecords } from '@/lib/backend/apiUtils';
 
 const router = createRouter<NextApiRequest, NextApiResponse<Resp>>();
 

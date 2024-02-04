@@ -1,0 +1,11 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+
+  .summary {
+    display: flex;
+    justify-content: space-evenly;
+  }
+}

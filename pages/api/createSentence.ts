@@ -1,16 +1,12 @@
-import { CREATE_SENTENCE_EXCEPTION } from '../../lib/retcode';
+import { CREATE_SENTENCE_EXCEPTION } from '@/lib/retcode';
+import { CreateSentenceParams } from '@/lib/backend/paramAndResp';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
-import { fail, suc } from '../../lib/resp';
-import { sentence } from '../../db/models';
-import { validateReq } from '../../middlewares/validateReq';
+import { fail, suc } from '@/lib/resp';
+import { sentence } from '@/db/models';
+import { validateReq } from '@/middlewares/validateReq';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
-
-interface CreateSentenceParams {
-  note: string
-  sentence: string
-}
 
 router.post(
   validateReq<CreateSentenceParams>({

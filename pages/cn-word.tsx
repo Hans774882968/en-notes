@@ -1,6 +1,9 @@
 import { CnWord } from '@/db/models/types';
+import { CnWordSearchResp, UpsertCnWordResp } from '@/lib/backend/paramAndResp';
 import { KeyboardEvent, useState } from 'react';
+import { btnLayout, formLayout } from '@/lib/const';
 import AutoComplete from 'antd/lib/auto-complete';
+import Button from 'antd/lib/button';
 import EnLayout from '@/components/EnLayout';
 import Form from 'antd/lib/form';
 import Message from 'antd/lib/message';
@@ -8,63 +11,46 @@ import QuestionCircleOutlined from '@ant-design/icons/QuestionCircleOutlined';
 import Request from '@/lib/frontend/request';
 import Tooltip from 'antd/lib/tooltip';
 import styles from './cn-word.module.scss';
-
-const formLayout = {
-  labelCol: { span: 3 },
-  wrapperCol: { span: 19 }
-};
-
-const btnLayout = {
-  wrapperCol: { offset: 3, span: 19 }
-};
-
-const SEARCH_WORD = 1;
-const CREATE_WORD = 2;
-const UPDATE_WORD = 3;
-type State = typeof SEARCH_WORD | typeof CREATE_WORD | typeof UPDATE_WORD;
-const stateToText: Record<State, string> = {
-  [CREATE_WORD]: 'Create Word',
-  [SEARCH_WORD]: 'Search Word',
-  [UPDATE_WORD]: 'Update Word'
-};
+import useCreateUpdateInOne from '@/lib/frontend/hooks/useCreateUpdateInOne';
 
 type EditWordForm = {
   note: string
 };
 
-type CnWordSearchRes = {
-  result: CnWord[]
-};
-
-type UpsertCnWordRes = {
-  created: boolean
-  word?: CnWord
-};
-
-// type GetAllCnWordsResp = {
-//   words: CnWord[]
-// };
-
-// function useCnWords() {
-//   const { data, isLoading } = useSWR<GetAllCnWordsResp, any, string>(
-//     '/api/getAllCnWords',
-//     (url) => Request.get({ url })
-//   );
-//   return { cnWords: data?.words, isLoading };
-// }
+function ModeField({ stateText }: { stateText: string }) {
+  const modeIntro = (
+    <>
+      <span>Search Word: Please start by searching a word</span><br />
+      <span>Create Word: word record is not found, your action will create a new word</span><br />
+      <span>Update Word: your action will update existing word</span>
+    </>
+  );
+  const modeToolTip = (
+    <>
+      <Tooltip placement="top" title={modeIntro}>
+        <QuestionCircleOutlined className={styles.formTooltipIcon} />
+      </Tooltip>
+      Mode
+    </>
+  );
+  return (
+    <Form.Item label={modeToolTip}>
+      <span>{stateText}</span>
+    </Form.Item>
+  );
+}
 
 export default function CnWordsDisplay() {
-  // const { cnWords, isLoading } = useCnWords();
+  const {
+    isSearchWordState,
+    isUpdateWordState,
+    changeToCreateWordState,
+    changeToSearchWordState,
+    changeToUpdateWordState,
+    stateText
+  } = useCreateUpdateInOne();
 
-  // if (isLoading) {
-  //   return <Spin />;
-  // }
-
-  // if (!cnWords) {
-  //   return <Empty />;
-  // }
   const [wordSearchKey, setWordSearchKey] = useState('');
-  const [currentState, setCurrentState] = useState<State>(SEARCH_WORD);
 
   const [searchResult, setSearchResult] = useState<CnWord[]>([]);
 
@@ -75,8 +61,8 @@ export default function CnWordsDisplay() {
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const shouldShowNoteField = currentState !== SEARCH_WORD;
-  const canNotSubmit = currentState === SEARCH_WORD || !noteFieldValue || isSubmitting;
+  const shouldShowNoteField = !isSearchWordState;
+  const canNotSubmit = isSearchWordState || !noteFieldValue || isSubmitting;
 
   const preventAccidentSubmit = (e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (e.key === 'Enter') e.preventDefault();
@@ -88,7 +74,7 @@ export default function CnWordsDisplay() {
 
   const handleWordSearch = async (newWord: string) => {
     try {
-      const { result } = await Request.get<CnWordSearchRes>({ params: { search: newWord }, url: '/api/cnWord/search' });
+      const { result } = await Request.get<CnWordSearchResp>({ params: { search: newWord }, url: '/api/cnWord/search' });
       setSearchResult(result);
     } catch (e) {
       return;
@@ -106,7 +92,7 @@ export default function CnWordsDisplay() {
     };
     setIsSubmitting(true);
     try {
-      const { created } = await Request.post<UpsertCnWordRes>({
+      const { created } = await Request.post<UpsertCnWordResp>({
         data: upsertCnWordParams,
         url: '/api/upsertCnWord'
       });
@@ -121,22 +107,6 @@ export default function CnWordsDisplay() {
     getCnWord();
   };
 
-  const modeIntro = (
-    <>
-      <span>Search Word: Please start by searching a word</span><br />
-      <span>Create Word: word record is not found, your action will create a new word</span><br />
-      <span>Update Word: your action will update existing word</span>
-    </>
-  );
-  const modeToolTip = (
-    <>
-      <Tooltip placement="top" title={modeIntro}>
-        <QuestionCircleOutlined className={styles.formTooltipIcon} />
-      </Tooltip>
-      Mode
-    </>
-  );
-
   return (
     <EnLayout>
       <div className={styles.word}>
@@ -148,9 +118,7 @@ export default function CnWordsDisplay() {
           onFinish={onFinish}
           autoComplete="off"
         >
-          <Form.Item label={modeToolTip}>
-            <span>{stateToText[currentState]}</span>
-          </Form.Item>
+          <ModeField stateText={stateText} />
 
           <Form.Item label="Word">
             <AutoComplete
@@ -162,6 +130,18 @@ export default function CnWordsDisplay() {
               onBlur={getCnWord}
               onInputKeyDown={(e) => preventAccidentSubmit(e)}
             />
+          </Form.Item>
+
+          <Form.Item {...btnLayout}>
+            <Button
+              className={styles.btn}
+              type="primary"
+              htmlType="submit"
+              disabled={canNotSubmit}
+              loading={isSubmitting}
+            >
+              Submit
+            </Button>
           </Form.Item>
         </Form>
       </div>
