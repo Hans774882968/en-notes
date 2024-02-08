@@ -24,10 +24,13 @@ import JSZip from 'jszip';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
-function setHeaders(res: NextApiResponse, fileName: string) {
+function setHeaders(res: NextApiResponse, fileName: string, fileSize = 0) {
   res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
   res.setHeader('Content-Type', 'application/octet-stream');
   res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+  if (fileSize) {
+    res.setHeader('Content-Length', fileSize);
+  }
 }
 
 router.get(
@@ -49,7 +52,8 @@ router.get(
 
     if (!separate) {
       const mdContent = await getMergedMdStr(junctionTables);
-      setHeaders(res, MERGED_MD_NAME);
+      const byteLength = Buffer.byteLength(mdContent, 'utf-8');
+      setHeaders(res, MERGED_MD_NAME, byteLength);
       res.end(mdContent);
       return;
     }
@@ -68,8 +72,9 @@ router.get(
       const synonymsMdStr = await getSeparateSynonymsMdStr();
       rootFolder?.file(SYNONYMS_MD, synonymsMdStr);
     }
-    setHeaders(res, SEPARATE_FILES_ZIP_NAME);
-    zip.generateNodeStream({ streamFiles: true, type: 'nodebuffer' }).pipe(res);
+    const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+    setHeaders(res, SEPARATE_FILES_ZIP_NAME, zipBuffer.byteLength);
+    res.end(zipBuffer);
   }
 );
 

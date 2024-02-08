@@ -1,6 +1,6 @@
-import { KeyboardEvent, useState } from 'react';
-import { Sentence } from '@/db/models/types';
-import { isMac, isWindows } from '@/lib/frontend/get-platform';
+import { CreateSentenceResp } from '@/lib/backend/paramAndResp';
+import { ctrlSAction } from '@/lib/frontend/keydownActions';
+import { useState } from 'react';
 import Button from 'antd/lib/button';
 import EnLayout from '@/components/EnLayout';
 import Form from 'antd/lib/form';
@@ -29,10 +29,6 @@ const rules = {
   sentence: [{ message: 'sentence should not be empty', required: true }]
 };
 
-type CreateSentenceRes = {
-  sentence: Sentence
-};
-
 export default function Create() {
   const [createSentenceForm] = Form.useForm<CreateSentenceForm>();
   const sentenceFieldValue = Form.useWatch('sentence', createSentenceForm);
@@ -45,18 +41,14 @@ export default function Create() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const canNotSubmit = !sentenceFieldValue || !noteFieldValue || isSubmitting;
 
-  const mdEditorKeyDown = (e: KeyboardEvent) => {
-    if (!((isWindows() && e.ctrlKey) || (isMac() && e.metaKey)) || e.code !== 'KeyS') return;
-    e.preventDefault();
-    createSentenceForm.submit();
-  };
+  const mdEditorKeyDown = ctrlSAction(() => createSentenceForm.submit());
 
   const onFinish = async (createSentenceFormData: CreateSentenceForm) => {
     if (canNotSubmit) return;
 
     setIsSubmitting(true);
     try {
-      await Request.post<CreateSentenceRes>({
+      await Request.post<CreateSentenceResp>({
         data: createSentenceFormData,
         url: '/api/createSentence'
       });
@@ -66,6 +58,11 @@ export default function Create() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const cleanNote = () => {
+    const cleanedNote = noteFieldValue.trim().replace(/  +/g, ' ');
+    createSentenceForm.setFieldValue('note', cleanedNote);
   };
 
   return (
@@ -94,6 +91,9 @@ export default function Create() {
               loading={isSubmitting}
             >
               Submit
+            </Button>
+            <Button className={styles.btn} onClick={cleanNote}>
+              Clean Note
             </Button>
           </Form.Item>
         </Form>

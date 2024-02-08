@@ -9,7 +9,7 @@ export async function randomRecord(
   model: ModelStatic<Model>,
   findAllOptions: Record<string, any> = {}
 ) {
-  let count = Math.max(parseInt(req.query?.count as any) || 1, 1);
+  const count = Math.max(parseInt(req.query?.count as any) || 1, 1);
   const result = await model.findAll({
     limit: count,
     order: [

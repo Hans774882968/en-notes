@@ -1,7 +1,9 @@
+import { AxiosProgressEvent } from 'axios';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import EnLayout from '@/components/EnLayout';
 import Form from 'antd/lib/form';
+import Progress from 'antd/lib/progress';
 import Request from '@/lib/frontend/request';
 import Switch from 'antd/lib/switch';
 import styles from './export.module.scss';
@@ -20,6 +22,8 @@ const exportBtnLayout = {
   wrapperCol: { offset: 6, span: 16 }
 };
 
+const exportDownloadProgressLayout = exportBtnLayout;
+
 export default function Export() {
   const [exportForm] = Form.useForm<ExportForm>();
   const initialValue: ExportForm = {
@@ -28,6 +32,9 @@ export default function Export() {
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [afterFirstSubmit, setAfterFirstSubmit] = useState(false);
+
+  const [downloadPercent, setDownloadPercent] = useState(0);
 
   const onFinish = async (exportFormOptions: ExportForm) => {
     const params = {
@@ -35,8 +42,17 @@ export default function Export() {
       separate: exportFormOptions.separate ? '1' : ''
     };
     setIsSubmitting(true);
+    setAfterFirstSubmit(true);
     try {
-      await Request.downloadGet({ params, url: '/api/export' });
+      await Request.downloadGet({
+        onDownloadProgress: (progressEvent: AxiosProgressEvent) => {
+          const tot = progressEvent.total || Infinity;
+          const percent = +(progressEvent.loaded / tot * 100).toFixed(1);
+          setDownloadPercent(percent);
+        },
+        params,
+        url: '/api/export'
+      });
     } catch (e) {
       return;
     } finally {
@@ -69,6 +85,16 @@ export default function Export() {
               Export
             </Button>
           </Form.Item>
+          {
+            afterFirstSubmit && (
+              <Form.Item {...exportDownloadProgressLayout}>
+                <Progress
+                  type="circle"
+                  percent={downloadPercent}
+                />
+              </Form.Item>
+            )
+          }
         </Form>
       </div>
     </EnLayout>

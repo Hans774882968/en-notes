@@ -13,6 +13,7 @@ export type Sentence = {
   sentence: string
   ctime: string
   mtime: string
+  words: Word[]
 };
 
 export type CnWord = {

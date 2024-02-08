@@ -5,12 +5,12 @@ const CREATE_WORD = 2;
 const UPDATE_WORD = 3;
 type State = typeof SEARCH_WORD | typeof CREATE_WORD | typeof UPDATE_WORD;
 const stateToText: Record<State, string> = {
-  [CREATE_WORD]: 'Create Word',
-  [SEARCH_WORD]: 'Search Word',
-  [UPDATE_WORD]: 'Update Word'
+  [CREATE_WORD]: 'Create',
+  [SEARCH_WORD]: 'Search',
+  [UPDATE_WORD]: 'Update'
 };
 
-export default function useCreateUpdateInOne() {
+export default function useCreateUpdateStateMachine() {
   const [currentState, setCurrentState] = useState<State>(SEARCH_WORD);
 
   const stateText = stateToText[currentState];

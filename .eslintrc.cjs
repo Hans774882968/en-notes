@@ -52,6 +52,8 @@ module.exports = {
       'always',
       { arraysInObjects: true, objectsInObjects: false }
     ],
+
+    'prefer-const': 'error',
     // 使用单引号
     quotes: ['error', 'single'],
     semi: 'error',

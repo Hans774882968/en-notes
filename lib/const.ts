@@ -15,3 +15,8 @@ export const formLayout = {
 export const btnLayout = {
   wrapperCol: { offset: 3, span: 19 }
 };
+
+export const DEBOUNCE_DEFAULT_TIMEOUT = 500;
+export const DEBOUNCE_DEFAULT_OPTION = {
+  trailing: true
+};

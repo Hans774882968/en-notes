@@ -74,9 +74,30 @@ export type UpsertWordResp = {
   word?: Word
 };
 
+export type GetCnWordResp = {
+  word: CnWord | null
+};
+
 export type UpsertCnWordResp = {
   created: boolean
   word?: CnWord
+};
+
+export type GetSentenceResp = {
+  sentence: Sentence | null
+};
+
+export type CreateSentenceResp = {
+  sentence: Sentence
+};
+
+export type UpdateSentenceResp = {
+  affectedCount: number
+  sentence: {
+    id: string
+    note: string
+    sentence: string
+  }
 };
 
 export type modelCountThisMonth = {
