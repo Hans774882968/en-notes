@@ -65,6 +65,10 @@ export type SentenceSearchResp = {
   result: Sentence[]
 };
 
+export type GetWordParams = {
+  word: string
+};
+
 export type GetWordResp = {
   word: Word | null
 };
@@ -81,6 +85,10 @@ export type GetCnWordResp = {
 export type UpsertCnWordResp = {
   created: boolean
   word?: CnWord
+};
+
+export type GetSentenceParams = {
+  sentence: string
 };
 
 export type GetSentenceResp = {

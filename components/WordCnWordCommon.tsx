@@ -40,7 +40,7 @@ const rules = {
 function ModeField({ stateText }: { stateText: string }) {
   const modeIntro = (
     <>
-      <span>Search: Please start by inputing a keyword</span><br />
+      <span>Search: Please start by inputting a keyword</span><br />
       <span>Create: record is not found, your action will create a new record</span><br />
       <span>Update: your action will update existing record</span>
     </>
@@ -57,6 +57,15 @@ function ModeField({ stateText }: { stateText: string }) {
     <Form.Item label={modeToolTip}>
       <span>{stateText}</span>
     </Form.Item>
+  );
+}
+
+function SearchToolTip() {
+  const intro = 'If the keyword is an empty string, the search won\'t be performed; otherwise, the search will be performed';
+  return (
+    <Tooltip placement="top" title={intro}>
+      <QuestionCircleOutlined className={styles.formTooltipIcon} />
+    </Tooltip>
   );
 }
 
@@ -164,10 +173,10 @@ export default function WordCnWordCommon({
         >
           <ModeField stateText={stateText} />
 
-          <Form.Item label="Word">
+          <Form.Item label={<SearchToolTip />}>
             <AutoComplete
               autoFocus
-              placeholder="Search word"
+              placeholder="Plz input keyword"
               options={searchResultOptions}
               onChange={handleWordChange}
               onSearch={debounceHandleWordSearch}

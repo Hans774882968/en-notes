@@ -1,4 +1,5 @@
 import { CreateSentenceResp } from '@/lib/backend/paramAndResp';
+import { btnLayout, formLayout } from '@/lib/const';
 import { ctrlSAction } from '@/lib/frontend/keydownActions';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
@@ -9,15 +10,6 @@ import MarkdownEditor from '@/components/MarkdownEditor';
 import Message from 'antd/lib/message';
 import Request from '@/lib/frontend/request';
 import styles from './create.module.scss';
-
-const formLayout = {
-  labelCol: { span: 3 },
-  wrapperCol: { span: 19 }
-};
-
-const btnLayout = {
-  wrapperCol: { offset: 3, span: 19 }
-};
 
 type CreateSentenceForm = {
   sentence: string

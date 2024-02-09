@@ -25,7 +25,7 @@ function CnWordReadOnlyInfo({ createTime, modifyTime }: {
   );
 }
 
-export default function CnWordsDisplay() {
+export default function CnWordPage() {
   const [createTime, setCreateTime] = useState('');
   const [modifyTime, setModifyTime] = useState('');
 

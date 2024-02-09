@@ -1,6 +1,7 @@
 import { AddWordSynonymResp, LinkWordAndSentenceResp, SentenceSearchResp, WordSearchResp } from '@/lib/backend/paramAndResp';
+import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayout } from '@/lib/const';
 import { Sentence, Word } from '@/db/models/types';
-import { btnLayout, formLayout } from '@/lib/const';
+import { useDebouncedCallback } from 'use-debounce';
 import { useState } from 'react';
 import AutoComplete from 'antd/lib/auto-complete';
 import Button from 'antd/lib/button';
@@ -26,27 +27,35 @@ function LinkWordAndSentenceForm() {
     setWord(newWord);
   };
 
-  const handleWordSearch = async (newWord: string) => {
-    try {
-      const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
-      setWordSearchResult(result);
-    } catch (e) {
-      return;
-    }
-  };
+  const handleWordSearch = useDebouncedCallback(
+    async (newWord: string) => {
+      try {
+        const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
+        setWordSearchResult(result);
+      } catch (e) {
+        return;
+      }
+    },
+    DEBOUNCE_DEFAULT_TIMEOUT,
+    DEBOUNCE_DEFAULT_OPTION
+  );
 
   const handleSentenceChange = (newSentenceId: string) => {
     setSentenceId(newSentenceId);
   };
 
-  const handleSentenceSearch = async (newSentence: string) => {
-    try {
-      const { result } = await Request.get<SentenceSearchResp>({ params: { search: newSentence }, url: '/api/sentence/search' });
-      setSentenceSearchResult(result);
-    } catch (e) {
-      return;
-    }
-  };
+  const handleSentenceSearch = useDebouncedCallback(
+    async (newSentence: string) => {
+      try {
+        const { result } = await Request.get<SentenceSearchResp>({ params: { search: newSentence }, url: '/api/sentence/search' });
+        setSentenceSearchResult(result);
+      } catch (e) {
+        return;
+      }
+    },
+    DEBOUNCE_DEFAULT_TIMEOUT,
+    DEBOUNCE_DEFAULT_OPTION
+  );
 
   const onFinish = async () => {
     const submitWord = word.trim().toLowerCase();
@@ -119,27 +128,35 @@ function AddSynonymForm() {
     setLhs(newWord);
   };
 
-  const handleLhsWordSearch = async (newWord: string) => {
-    try {
-      const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
-      setLhsWordSearchResult(result);
-    } catch (e) {
-      return;
-    }
-  };
+  const handleLhsWordSearch = useDebouncedCallback(
+    async (newWord: string) => {
+      try {
+        const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
+        setLhsWordSearchResult(result);
+      } catch (e) {
+        return;
+      }
+    },
+    DEBOUNCE_DEFAULT_TIMEOUT,
+    DEBOUNCE_DEFAULT_OPTION
+  );
 
   const handleRhsWordChange = (newWord: string) => {
     setRhs(newWord);
   };
 
-  const handleRhsWordSearch = async (newWord: string) => {
-    try {
-      const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
-      setRhsWordSearchResult(result);
-    } catch (e) {
-      return;
-    }
-  };
+  const handleRhsWordSearch = useDebouncedCallback(
+    async (newWord: string) => {
+      try {
+        const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
+        setRhsWordSearchResult(result);
+      } catch (e) {
+        return;
+      }
+    },
+    DEBOUNCE_DEFAULT_TIMEOUT,
+    DEBOUNCE_DEFAULT_OPTION
+  );
 
   const onFinish = async () => {
     const submitLhs = lhs.trim().toLowerCase();

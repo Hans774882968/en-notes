@@ -1,6 +1,6 @@
-import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT } from '@/lib/const';
+import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayout } from '@/lib/const';
 import { GetSentenceResp, SentenceSearchResp, UpdateSentenceResp } from '@/lib/backend/paramAndResp';
-import { Sentence } from '@/db/models/types';
+import { Sentence, Word } from '@/db/models/types';
 import { ctrlSAction } from '@/lib/frontend/keydownActions';
 import { useDebouncedCallback } from 'use-debounce';
 import { useState } from 'react';
@@ -10,18 +10,10 @@ import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import Message from 'antd/lib/message';
+import RelevantWordsNode from '@/components/word/RelevantWordsNode';
 import Request from '@/lib/frontend/request';
 import Select from 'antd/lib/select';
 import styles from './edit.module.scss';
-
-const formLayout = {
-  labelCol: { span: 3 },
-  wrapperCol: { span: 19 }
-};
-
-const btnLayout = {
-  wrapperCol: { offset: 3, span: 19 }
-};
 
 type EditSentenceForm = {
   sentence: string
@@ -33,16 +25,14 @@ const rules = {
   sentence: [{ message: 'sentence should not be empty', required: true }]
 };
 
-function SentenceReadOnlyInfo({ createTime, modifyTime, wordsText }: {
+function SentenceReadOnlyInfo({ createTime, modifyTime, words }: {
   createTime: string
   modifyTime: string
-  wordsText: string
+  words: Word[]
 }) {
   return (
     <>
-      <Form.Item label="Relevant Words">
-        <span>{wordsText || 'No words recorded yet'}</span>
-      </Form.Item>
+      <RelevantWordsNode words={words} />
       <Form.Item label="Create Time">
         <span>{createTime}</span>
       </Form.Item>
@@ -61,7 +51,7 @@ export default function Edit() {
     sentence: ''
   };
 
-  const [wordsText, setWordsText] = useState('');
+  const [relevantWords, setRelevantWords] = useState<Word[]>([]);
   const [createTime, setCreateTime] = useState('');
   const [modifyTime, setModifyTime] = useState('');
 
@@ -106,7 +96,7 @@ export default function Edit() {
       return;
     }
     setSentenceFetched(true);
-    setWordsText(sentence.words.map(({ word }) => word).join('; '));
+    setRelevantWords(sentence.words);
     setCreateTime(sentence.ctime);
     setModifyTime(sentence.mtime);
     editSentenceForm.setFieldValue('sentence', sentence.sentence);
@@ -184,7 +174,7 @@ export default function Edit() {
                 <SentenceReadOnlyInfo
                   createTime={createTime}
                   modifyTime={modifyTime}
-                  wordsText={wordsText}
+                  words={relevantWords}
                 />
                 <Form.Item label="Sentence" name="sentence" rules={rules.sentence}>
                   <Input />

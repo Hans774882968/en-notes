@@ -4,56 +4,14 @@ import { useState } from 'react';
 import Form from 'antd/lib/form';
 import Request from '@/lib/frontend/request';
 import WordCnWordCommon from '@/components/WordCnWordCommon';
-import styles from './word.module.scss';
+import WordReadOnlyInfo from '@/components/word/WordReadOnlyInfo';
 
 type EditWordForm = {
   note: string
 };
 
-function Sentences({ sentences }: { sentences: Sentence[] }) {
-  return (
-    <Form.Item label="Sentences">
-      {
-        !sentences.length ? <span>No sentences recorded yet</span> : (
-          <ol className={styles.sentences}>
-            {
-              sentences.map(({ sentence }) => {
-                return (
-                  <li key={sentence}>{sentence}</li>
-                );
-              })
-            }
-          </ol>
-        )
-      }
-    </Form.Item>
-  );
-}
-
-function WordReadOnlyInfo({ createTime, modifyTime, sentences, synonymsText }: {
-  createTime: string
-  modifyTime: string
-  sentences: Sentence[]
-  synonymsText: string
-}) {
-  return (
-    <>
-      <Form.Item label="Synonyms">
-        <span>{synonymsText || 'No synonyms recorded yet'}</span>
-      </Form.Item>
-      <Sentences sentences={sentences} />
-      <Form.Item label="Create Time">
-        <span>{createTime}</span>
-      </Form.Item>
-      <Form.Item label="Modify Time">
-        <span>{modifyTime}</span>
-      </Form.Item>
-    </>
-  );
-}
-
 export default function WordPage() {
-  const [synonymsText, setSynonymsText] = useState('');
+  const [synonyms, setSynonyms] = useState<Word[]>([]);
   const [sentences, setSentences] = useState<Sentence[]>([]);
   const [createTime, setCreateTime] = useState('');
   const [modifyTime, setModifyTime] = useState('');
@@ -79,7 +37,7 @@ export default function WordPage() {
   const afterGetWord = (word: any) => {
     setCreateTime(word.ctime);
     setModifyTime(word.mtime);
-    setSynonymsText(word.itsSynonyms.map(({ word }: any) => word).join('; '));
+    setSynonyms(word.itsSynonyms);
     setSentences(word.sentences);
   };
 
@@ -116,7 +74,7 @@ export default function WordPage() {
           createTime={createTime}
           modifyTime={modifyTime}
           sentences={sentences}
-          synonymsText={synonymsText}
+          synonyms={synonyms}
         />
       }
       searchResultOptions={searchResultOptions}
