@@ -26,6 +26,10 @@ export default function WordPage() {
   };
 
   const handleWordSearch = async (newWord: string) => {
+    if (!newWord) {
+      setSearchResult([]);
+      return;
+    }
     try {
       const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
       setSearchResult(result);

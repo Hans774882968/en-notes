@@ -39,6 +39,10 @@ export default function CnWordPage() {
   };
 
   const handleWordSearch = async (newWord: string) => {
+    if (!newWord) {
+      setSearchResult([]);
+      return;
+    }
     try {
       const { result } = await Request.get<CnWordSearchResp>({ params: { search: newWord }, url: '/api/cnWord/search' });
       setSearchResult(result);

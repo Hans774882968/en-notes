@@ -1,37 +1,71 @@
-import { RecordCountThisMonthResp } from '@/lib/backend/paramAndResp';
+import { DashboardResp } from '@/lib/backend/paramAndResp';
 import { useThemeContext } from '@/components/ThemeContext';
 import Card from 'antd/lib/card';
+import Col from 'antd/lib/col';
 import EnLayout from '@/components/EnLayout';
+import Form from 'antd/lib/form';
 import ReactEcharts from 'echarts-for-react';
 import Request from '@/lib/frontend/request';
+import Row from 'antd/lib/row';
 import styles from './dashboard.module.scss';
 import useSWR from 'swr';
+
+export const displayFormLayout = {
+  labelCol: { span: 16 }
+};
+
+function TotalCard({
+  title,
+  learn,
+  learnOrReview
+}: { title: string, learn: number, learnOrReview: number }) {
+  return (
+    <Card size="small" title={title} hoverable>
+      <Form {...displayFormLayout}>
+        <Form.Item style={{ marginBottom: 0 }} label="learned this month">{learn}</Form.Item>
+        <Form.Item style={{ marginBottom: 0 }} label="learned or reviewed this month">{learnOrReview}</Form.Item>
+      </Form>
+    </Card>
+  );
+}
 
 function useRecordCountThisMonth() {
   const { data, isLoading } = useSWR(
     '/api/dashboard/recordCountThisMonth',
-    (url) => Request.get<RecordCountThisMonthResp>({ url })
+    (url) => Request.get<DashboardResp>({ url })
   );
-  const wordTotal = data?.word.total || 0;
-  const wordDateArr = data?.word.result.map((item) => item.date) || [];
-  const wordCountArr = data?.word.result.map((item) => item.count) || [];
-  const cnWordTotal = data?.cnWord.total || 0;
-  const cnWordDateArr = data?.cnWord.result.map((item) => item.date) || [];
-  const cnWordCountArr = data?.cnWord.result.map((item) => item.count) || [];
-  const sentenceTotal = data?.sentence.total || 0;
-  const sentenceDateArr = data?.sentence.result.map((item) => item.date) || [];
-  const sentenceCountArr = data?.sentence.result.map((item) => item.count) || [];
+  const wordLearn = data?.word.learn || 0;
+  const wordLearnOrReview = data?.word.learnOrReview || 0;
+  const wordDateArr = data?.word.data.map((item) => item.date) || [];
+  const wordLearnArr = data?.word.data.map((item) => item.learn) || [];
+  const wordLearnOrReviewArr = data?.word.data.map((item) => item.learnOrReview) || [];
+  const cnWordLearn = data?.cnWord.learn || 0;
+  const cnWordLearnOrReview = data?.cnWord.learnOrReview || 0;
+  const cnWordDateArr = data?.cnWord.data.map((item) => item.date) || [];
+  const cnWordLearnArr = data?.cnWord.data.map((item) => item.learn) || [];
+  const cnWordLearnOrReviewArr = data?.cnWord.data.map((item) => item.learnOrReview) || [];
+  const sentenceLearn = data?.sentence.learn || 0;
+  const sentenceLearnOrReview = data?.sentence.learnOrReview || 0;
+  const sentenceDateArr = data?.sentence.data.map((item) => item.date) || [];
+  const sentenceLearnArr = data?.sentence.data.map((item) => item.learn) || [];
+  const sentenceLearnOrReviewArr = data?.sentence.data.map((item) => item.learnOrReview) || [];
   return {
-    cnWordCountArr,
     cnWordDateArr,
-    cnWordTotal,
+    cnWordLearn,
+    cnWordLearnArr,
+    cnWordLearnOrReview,
+    cnWordLearnOrReviewArr,
     isLoading,
-    sentenceCountArr,
     sentenceDateArr,
-    sentenceTotal,
-    wordCountArr,
+    sentenceLearn,
+    sentenceLearnArr,
+    sentenceLearnOrReview,
+    sentenceLearnOrReviewArr,
     wordDateArr,
-    wordTotal
+    wordLearn,
+    wordLearnArr,
+    wordLearnOrReview,
+    wordLearnOrReviewArr
   };
 }
 
@@ -41,31 +75,63 @@ function Dashboard() {
   const mdEditorThemeName = themeContext?.mdEditorThemeName;
 
   const {
-    cnWordCountArr,
     cnWordDateArr,
-    cnWordTotal,
-    wordCountArr,
-    wordDateArr,
-    wordTotal,
-    sentenceCountArr,
+    cnWordLearn,
+    cnWordLearnArr,
+    cnWordLearnOrReview,
+    cnWordLearnOrReviewArr,
     sentenceDateArr,
-    sentenceTotal
+    sentenceLearn,
+    sentenceLearnArr,
+    sentenceLearnOrReview,
+    sentenceLearnOrReviewArr,
+    wordDateArr,
+    wordLearn,
+    wordLearnArr,
+    wordLearnOrReview,
+    wordLearnOrReviewArr
   } = useRecordCountThisMonth();
 
-  const getStatisticsOption = (model: string, dateArr: unknown[], countArr: number[]) => ({
+  const getStatisticsOption = (
+    model: string,
+    dateArr: unknown[],
+    learnArr: number[],
+    learnOrReviewArr: number[]
+  ) => ({
+    legend: {
+      orient: 'vertical',
+      x: 'right',
+      y: 'top'
+    },
     series: [
       {
-        data: countArr,
+        data: learnArr,
         label: {
           position: 'top',
           show: true
         },
+        name: 'Learn',
+        type: 'line'
+      },
+      {
+        data: learnOrReviewArr,
+        label: {
+          position: 'top',
+          show: true
+        },
+        name: 'Learn or Review',
         type: 'line'
       }
     ],
     title: {
       left: 'center',
-      text: `Statistics of the number of ${model}s learned this month`
+      text: `Statistics of ${model}s this month`
+    },
+    tooltip: {
+      axisPointer: {
+        type: 'cross'
+      },
+      trigger: 'axis'
     },
     xAxis: {
       data: dateArr,
@@ -76,21 +142,27 @@ function Dashboard() {
     }
   });
 
-  const wordCountOption = getStatisticsOption('word', wordDateArr, wordCountArr);
-  const cnWordCountOption = getStatisticsOption('English topic', cnWordDateArr, cnWordCountArr);
-  const sentenceCountOption = getStatisticsOption('sentence', sentenceDateArr, sentenceCountArr);
+  const wordOption = getStatisticsOption('word', wordDateArr, wordLearnArr, wordLearnOrReviewArr);
+  const cnWordOption = getStatisticsOption('English topic', cnWordDateArr, cnWordLearnArr, cnWordLearnOrReviewArr);
+  const sentenceOption = getStatisticsOption('sentence', sentenceDateArr, sentenceLearnArr, sentenceLearnOrReviewArr);
 
   return (
     <div className={styles.dashboard}>
-      <div className={styles.summary}>
-        <Card size="small" title="words learned this month">{wordTotal}</Card>
-        <Card size="small" title="English topics learned this month">{cnWordTotal}</Card>
-        <Card size="small" title="sentences learned this month">{sentenceTotal}</Card>
-      </div>
+      <Row gutter={16}>
+        <Col span={8}>
+          <TotalCard title="words" learn={wordLearn} learnOrReview={wordLearnOrReview} />
+        </Col>
+        <Col span={8}>
+          <TotalCard title="English topics" learn={cnWordLearn} learnOrReview={cnWordLearnOrReview} />
+        </Col>
+        <Col span={8}>
+          <TotalCard title="sentences" learn={sentenceLearn} learnOrReview={sentenceLearnOrReview} />
+        </Col>
+      </Row>
       <div>
-        <ReactEcharts option={wordCountOption} theme={mdEditorThemeName} />
-        <ReactEcharts option={cnWordCountOption} theme={mdEditorThemeName} />
-        <ReactEcharts option={sentenceCountOption} theme={mdEditorThemeName} />
+        <ReactEcharts option={wordOption} theme={mdEditorThemeName} />
+        <ReactEcharts option={cnWordOption} theme={mdEditorThemeName} />
+        <ReactEcharts option={sentenceOption} theme={mdEditorThemeName} />
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { GetWordParams, GetWordResp } from '@/lib/backend/paramAndResp';
+import { Word } from '@/db/models/types';
 import { formLayout } from '@/lib/const';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
@@ -9,22 +10,42 @@ import Request from '@/lib/frontend/request';
 import SentencesItem from './SentencesItem';
 import useSWR from 'swr';
 
+/**
+ * 单词详情对话框
+ * @param {Word} externalData 若指定外部数据源，则直接使用，不发请求
+ */
+
 interface Props {
   word: string
+  externalData?: Word
   open: boolean
   onCancel: ModalProps['onCancel']
 }
 
-function useGetWord(params: GetWordParams, dialogOpen: boolean) {
+interface UseGetWordParams {
+  params: GetWordParams
+  dialogOpen: boolean
+  externalData?: Word
+}
+
+function useGetWord({ params, dialogOpen, externalData }: UseGetWordParams) {
+  const shouldSendReq = dialogOpen && !externalData;
   const { data, isLoading } = useSWR(
-    dialogOpen ? ['/api/getWord', params] : null,
+    shouldSendReq ? ['/api/getWord', params] : null,
     ([url, params]) => Request.get<GetWordResp>({ params, url })
   );
+  if (!shouldSendReq) {
+    return { isLoading: false, word: externalData };
+  }
   return { isLoading, ...data };
 }
 
-export function WordInfoDialog({ word, open, onCancel }: Props) {
-  const { word: wordRecord } = useGetWord({ word }, open);
+export function WordInfoDialog({ word, open, onCancel, externalData }: Props) {
+  const { word: wordRecord } = useGetWord({
+    dialogOpen: open,
+    externalData,
+    params: { word }
+  });
 
   const [currentNextWord, setCurrentNextWord] = useState('');
   const [isNextModalOpen, setIsNextModalOpen] = useState(false);

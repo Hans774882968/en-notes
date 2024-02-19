@@ -1,5 +1,5 @@
 import { CnWord, Sentence, Word } from '@/db/models/types';
-import { GroupedCountResultItem } from 'sequelize';
+import { TableParams, TableResp } from '../table';
 
 export interface ExportParams {
   junctionTables?: string
@@ -73,6 +73,15 @@ export type GetWordResp = {
   word: Word | null
 };
 
+export type GetWordListParams = TableParams<{
+  word?: string
+  note?: string
+  ctime?: string[]
+  mtime?: string[]
+}>;
+
+export type GetWordListResp = TableResp<Word>;
+
 export type UpsertWordResp = {
   created: boolean
   word?: Word
@@ -110,11 +119,23 @@ export type UpdateSentenceResp = {
 
 export type modelCountThisMonth = {
   total: number
-  result: GroupedCountResultItem[]
+  result: Map<string, number>
+};
+
+export type DashboardRecordResultItem = {
+  date: string
+  learn: number
+  learnOrReview: number
 };
 
 export type RecordCountThisMonthResp = {
-  word: modelCountThisMonth
-  cnWord: modelCountThisMonth
-  sentence: modelCountThisMonth
+  learn: number
+  learnOrReview: number
+  data: DashboardRecordResultItem[]
+};
+
+export type DashboardResp = {
+  word: RecordCountThisMonthResp
+  cnWord: RecordCountThisMonthResp
+  sentence: RecordCountThisMonthResp
 };

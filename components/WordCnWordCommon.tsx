@@ -12,6 +12,7 @@ import Form, { FormInstance } from 'antd/lib/form';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import Message from 'antd/lib/message';
 import QuestionCircleOutlined from '@ant-design/icons/QuestionCircleOutlined';
+import SearchToolTip from './SearchToolTip';
 import Tooltip from 'antd/lib/tooltip';
 import styles from './WordCnWordCommon.module.scss';
 import useCreateUpdateStateMachine from '@/lib/frontend/hooks/useCreateUpdateStateMachine';
@@ -57,15 +58,6 @@ function ModeField({ stateText }: { stateText: string }) {
     <Form.Item label={modeToolTip}>
       <span>{stateText}</span>
     </Form.Item>
-  );
-}
-
-function SearchToolTip() {
-  const intro = 'If the keyword is an empty string, the search won\'t be performed; otherwise, the search will be performed';
-  return (
-    <Tooltip placement="top" title={intro}>
-      <QuestionCircleOutlined className={styles.formTooltipIcon} />
-    </Tooltip>
   );
 }
 

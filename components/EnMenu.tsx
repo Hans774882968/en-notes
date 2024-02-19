@@ -6,6 +6,7 @@ import EditOutlined from '@ant-design/icons/EditOutlined';
 import ExportOutlined from '@ant-design/icons/ExportOutlined';
 import Menu, { MenuProps } from 'antd/lib/menu';
 import SettingOutlined from '@ant-design/icons/SettingOutlined';
+import TableOutlined from '@ant-design/icons/TableOutlined';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -27,8 +28,9 @@ function getItem(
 
 const items: MenuProps['items'] = [
   getItem('Word', '1-1', <AppstoreOutlined />, [
-    getItem('Edit', '/word', <EditOutlined />),
-    getItem('Word Settings', '/word-settings', <SettingOutlined />)
+    getItem('Edit', '/word/word', <EditOutlined />),
+    getItem('List', '/word/list', <TableOutlined />),
+    getItem('Word Settings', '/word/word-settings', <SettingOutlined />)
   ]),
   getItem('English Topic', '/cn-word', <EditOutlined />),
   getItem('Sentence', '1-3', <AppstoreOutlined />, [

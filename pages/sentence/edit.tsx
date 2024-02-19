@@ -12,6 +12,7 @@ import MarkdownEditor from '@/components/MarkdownEditor';
 import Message from 'antd/lib/message';
 import RelevantWordsNode from '@/components/word/RelevantWordsNode';
 import Request from '@/lib/frontend/request';
+import SearchToolTip from '@/components/SearchToolTip';
 import Select from 'antd/lib/select';
 import styles from './edit.module.scss';
 
@@ -156,7 +157,7 @@ export default function Edit() {
           onFinish={onFinish}
           autoComplete="off"
         >
-          <Form.Item label="Search">
+          <Form.Item label={<SearchToolTip />}>
             <Select
               autoFocus
               placeholder="Search sentence"

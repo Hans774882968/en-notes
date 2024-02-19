@@ -69,7 +69,7 @@ export default function Create() {
           autoComplete="off"
         >
           <Form.Item label="Sentence" name="sentence" rules={rules.sentence}>
-            <Input />
+            <Input autoFocus />
           </Form.Item>
           <Form.Item label="Note" name="note" rules={rules.note}>
             <MarkdownEditor onKeyDown={mdEditorKeyDown} />

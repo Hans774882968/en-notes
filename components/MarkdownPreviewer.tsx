@@ -1,5 +1,8 @@
+import '@uiw/react-markdown-preview/markdown.css';
 import '@uiw/react-md-editor/markdown-editor.css';
 import dynamic from 'next/dynamic';
+import rehypeSanitize from 'rehype-sanitize';
+import styles from './md-editor-custom.module.scss';
 
 const MDEditor = dynamic(
   () => import('@uiw/react-md-editor'),
@@ -12,6 +15,15 @@ interface Props {
 
 export default function MarkdownPreviewer({ value }: Props) {
   return (
-    <MDEditor value={value} preview="preview" />
+    <MDEditor
+      className={styles.editor}
+      value={value}
+      preview="preview"
+      previewOptions={{
+        rehypePlugins: [[rehypeSanitize]]
+      }}
+      height={350}
+      spellCheck={true} // seems useless
+    />
   );
 }

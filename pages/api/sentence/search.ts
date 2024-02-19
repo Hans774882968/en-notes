@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { SearchParams } from '@/lib/backend/paramAndResp';
 import { createRouter } from 'next-connect';
-import { isSubSequence } from '@/lib/backend/utils';
+import { isSubSequence } from '@/lib/utils';
 import { sentence } from '@/db/models';
 import { suc } from '@/lib/resp';
 import { validateReq } from '@/middlewares/validateReq';
