@@ -20,7 +20,8 @@ export default function WordPage() {
   const searchResultOptions = searchResult.map((wd) => ({ label: wd.word, value: wd.word }));
 
   const [editWordForm] = Form.useForm<EditWordForm>();
-  const noteFieldValue = Form.useWatch('note', editWordForm);
+  // antd 给出的类型标注不对，它可能是 undefined ，所以要保证它真的是 string
+  const noteFieldValue = Form.useWatch('note', editWordForm) || '';
   const initialValue = {
     note: ''
   };

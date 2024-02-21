@@ -2,6 +2,7 @@ import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayou
 import { GetSentenceResp, SentenceSearchResp, UpdateSentenceResp } from '@/lib/backend/paramAndResp';
 import { Sentence, Word } from '@/db/models/types';
 import { ctrlSAction } from '@/lib/frontend/keydownActions';
+import { useBeforeUnload } from 'react-use';
 import { useDebouncedCallback } from 'use-debounce';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
@@ -19,11 +20,6 @@ import styles from './edit.module.scss';
 type EditSentenceForm = {
   sentence: string
   note: string
-};
-
-const rules = {
-  note: [{ message: 'note should not be empty', required: true }],
-  sentence: [{ message: 'sentence should not be empty', required: true }]
 };
 
 function SentenceReadOnlyInfo({ createTime, modifyTime, words }: {
@@ -60,10 +56,30 @@ export default function Edit() {
   const [searchResult, setSearchResult] = useState<Sentence[]>([]);
   const searchResultOptions = searchResult.map((st) => ({ label: st.sentence, value: st.id }));
 
+  const [originalNote, setOriginalNote] = useState('');
+
+  // TODO: 点击菜单切换 URL 时也要拦截
+  const isNoteChanged = noteFieldValue !== originalNote;
+  useBeforeUnload(isNoteChanged, 'Changes you have made to the Note field may not be saved');
+
   const [sentenceFetched, setSentenceFetched] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const canNotSubmit = !sentenceFetched || !noteFieldValue || !isNoteChanged || isSubmitting;
 
-  const canNotSubmit = !sentenceFetched || isSubmitting;
+  const rules = {
+    note: [
+      { message: 'note should not be empty', required: true },
+      {
+        validator: (_: object, value: string) => {
+          if (originalNote === value) {
+            return Promise.reject(new Error('note should be modified'));
+          }
+          return Promise.resolve();
+        }
+      }
+    ],
+    sentence: [{ message: 'sentence should not be empty', required: true }]
+  };
 
   const handleSentenceChange = (newSentenceId: string) => {
     setSentenceId(newSentenceId);
@@ -94,6 +110,8 @@ export default function Edit() {
       return;
     }
     if (!sentence) {
+      // 只要不去数据库快速删除记录，理论上就不会走到这里
+      setOriginalNote('');
       return;
     }
     setSentenceFetched(true);
@@ -102,6 +120,7 @@ export default function Edit() {
     setModifyTime(sentence.mtime);
     editSentenceForm.setFieldValue('sentence', sentence.sentence);
     editSentenceForm.setFieldValue('note', sentence.note);
+    setOriginalNote(sentence.note);
   };
 
   const mdEditorKeyDown = ctrlSAction(() => editSentenceForm.submit());
@@ -181,7 +200,10 @@ export default function Edit() {
                   <Input />
                 </Form.Item>
                 <Form.Item label="Note" name="note" rules={rules.note}>
-                  <MarkdownEditor onKeyDown={mdEditorKeyDown} />
+                  <MarkdownEditor
+                    onKeyDown={mdEditorKeyDown}
+                    highlightBorder={isNoteChanged}
+                  />
                 </Form.Item>
               </>
             )

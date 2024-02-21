@@ -1,4 +1,14 @@
+@import '../styles/theme.scss';
+
 .editor {
+  &.modified {
+    @include useTheme {
+      box-shadow:
+        0 0 0 1px getThemeVar('mdEditorModifiedBorderColor'),
+        0 0 0 getThemeVar('mdEditorModifiedBorderColor'),
+        0 1px 1px getThemeVar('mdEditorModifiedBorderColor');
+    }
+  }
 
   :global(.w-md-editor-text-pre),
   :global(.w-md-editor-text-pre > code),
@@ -6,4 +16,11 @@
     font-size: 20px !important;
     line-height: 20px !important;
   }
+}
+
+.statistics {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+  gap: 16px;
 }

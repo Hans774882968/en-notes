@@ -1,4 +1,4 @@
-import { CnWord, Sentence, Word } from '@/db/models/types';
+import { CnWord, Sentence, SentenceIdType, Word } from '@/db/models/types';
 import { TableParams, TableResp } from '../table';
 
 export interface ExportParams {
@@ -22,13 +22,13 @@ export interface AddWordSynonymResp {
 }
 
 export interface LinkWordAndSentenceParams {
-  sentenceId: string
+  sentenceId: SentenceIdType
   word: string
 }
 
 export interface LinkWordAndSentenceResp {
   created: boolean
-  sentenceId: string
+  sentenceId: SentenceIdType
   word: string
 }
 
@@ -48,7 +48,7 @@ export interface CreateSentenceParams {
 }
 
 export interface UpdateSentenceParams {
-  id: string
+  id: SentenceIdType
   note: string
   sentence: string
 }
@@ -111,7 +111,7 @@ export type CreateSentenceResp = {
 export type UpdateSentenceResp = {
   affectedCount: number
   sentence: {
-    id: string
+    id: SentenceIdType
     note: string
     sentence: string
   }
@@ -134,8 +134,21 @@ export type RecordCountThisMonthResp = {
   data: DashboardRecordResultItem[]
 };
 
+export type pieChartItem = {
+  name: string
+  value: number
+};
+
+export type SynonymCountResp = Array<pieChartItem>;
+
+export type SentenceCountOfWordResp = Array<pieChartItem>;
+
 export type DashboardResp = {
-  word: RecordCountThisMonthResp
-  cnWord: RecordCountThisMonthResp
-  sentence: RecordCountThisMonthResp
+  recordCount: {
+    word: RecordCountThisMonthResp
+    cnWord: RecordCountThisMonthResp
+    sentence: RecordCountThisMonthResp
+  }
+  synonymCount: SynonymCountResp
+  sentenceCountOfWord: SentenceCountOfWordResp
 };

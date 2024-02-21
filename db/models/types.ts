@@ -7,8 +7,10 @@ export type Word = {
   itsSynonyms: Word[]
 };
 
+export type SentenceIdType = number | string;
+
 export type Sentence = {
-  id: string
+  id: SentenceIdType
   note: string
   sentence: string
   ctime: string

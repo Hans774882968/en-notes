@@ -2,7 +2,7 @@ import { ADD_WORD_SYNONYM_EXCEPTION, LHS_RHS_SHOULD_NOT_EQUAL, WORD_NOT_FOUND } 
 import { AddWordSynonymParams } from '@/lib/backend/paramAndResp';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
-import { enWordRegex } from '@/db/const';
+import { enWordValidatorSchema } from '@/lib/backend/paramValidators';
 import { fail, suc } from '@/lib/resp';
 import { synonym, word } from '@/db/models';
 import { validateReq } from '@/middlewares/validateReq';
@@ -12,13 +12,7 @@ const router = createRouter<NextApiRequest, NextApiResponse>();
 router.post(
   validateReq<AddWordSynonymParams> ({
     keywordObjects: [
-      {
-        keyword: 'wordLegal',
-        type: 'string',
-        validate: (schema: Record<string, any>, wordData: string) => {
-          return enWordRegex.test(wordData.trim());
-        }
-      }
+      enWordValidatorSchema
     ],
     schema: {
       additionalProperties: false,

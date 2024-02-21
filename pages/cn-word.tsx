@@ -33,7 +33,7 @@ export default function CnWordPage() {
   const searchResultOptions = searchResult.map((wd) => ({ label: wd.word, value: wd.word }));
 
   const [editWordForm] = Form.useForm<EditWordForm>();
-  const noteFieldValue = Form.useWatch('note', editWordForm);
+  const noteFieldValue = Form.useWatch('note', editWordForm) || '';
   const initialValue = {
     note: ''
   };

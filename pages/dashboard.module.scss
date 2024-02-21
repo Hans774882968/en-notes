@@ -3,4 +3,14 @@
   flex-direction: column;
   gap: 16px;
   padding: 16px;
+
+  .pieCharts {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+
+    .pieChart {
+      flex: 1;
+    }
+  }
 }

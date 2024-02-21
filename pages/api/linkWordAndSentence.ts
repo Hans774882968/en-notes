@@ -2,9 +2,8 @@ import { LINK_WORD_SENTENCE_EXCEPTION, SENTENCE_NOT_FOUND, WORD_NOT_FOUND } from
 import { LinkWordAndSentenceParams } from '@/lib/backend/paramAndResp';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
-import { enWordRegex } from '@/db/const';
+import { enWordValidatorSchema, sentenceIdValidatorSchema } from '@/lib/backend/paramValidators';
 import { fail, suc } from '@/lib/resp';
-import { isLegalSentenceId } from '@/db/models/sentence';
 import { sentence, word, wordSentence } from '@/db/models';
 import { validateReq } from '@/middlewares/validateReq';
 
@@ -13,25 +12,13 @@ const router = createRouter<NextApiRequest, NextApiResponse>();
 router.post(
   validateReq<LinkWordAndSentenceParams>({
     keywordObjects: [
-      {
-        keyword: 'wordLegal',
-        type: 'string',
-        validate: (schema: Record<string, any>, wordData: string) => {
-          return enWordRegex.test(wordData.trim());
-        }
-      },
-      {
-        keyword: 'sentenceIdLegal',
-        type: 'string',
-        validate: (schema: Record<string, any>, sentenceIdData: string) => {
-          return isLegalSentenceId(sentenceIdData.trim());
-        }
-      }
+      enWordValidatorSchema,
+      sentenceIdValidatorSchema
     ],
     schema: {
       additionalProperties: false,
       properties: {
-        sentenceId: { sentenceIdLegal: null, type: 'string' },
+        sentenceId: { sentenceIdLegal: null, type: ['number', 'string'] },
         word: { type: 'string', wordLegal: null }
       },
       required: ['word', 'sentenceId'],
@@ -40,7 +27,7 @@ router.post(
   }),
   async(req, res) => {
     let { sentenceId, word: wordData } = req.body;
-    sentenceId = sentenceId.trim();
+    sentenceId = sentenceId.toString().trim();
     wordData = wordData.trim().toLowerCase();
 
     const wordRecord = await word.findByPk(wordData);

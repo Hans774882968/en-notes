@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { UPSERT_WORD_EXCEPTION } from '@/lib/retcode';
 import { UpsertWordParams } from '@/lib/backend/paramAndResp';
 import { createRouter } from 'next-connect';
-import { enWordRegex } from '@/db/const';
+import { enWordValidatorSchema } from '@/lib/backend/paramValidators';
 import { upsertWordRecord } from '@/lib/backend/apiUtils';
 import { validateReq } from '@/middlewares/validateReq';
 import { word } from '@/db/models';
@@ -12,13 +12,7 @@ const router = createRouter<NextApiRequest, NextApiResponse>();
 router.post(
   validateReq<UpsertWordParams>({
     keywordObjects: [
-      {
-        keyword: 'wordLegal',
-        type: 'string',
-        validate: (schema: Record<string, any>, wordData: string) => {
-          return enWordRegex.test(wordData.trim());
-        }
-      }
+      enWordValidatorSchema
     ],
     schema: {
       additionalProperties: false,

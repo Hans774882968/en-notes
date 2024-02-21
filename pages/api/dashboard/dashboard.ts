@@ -1,4 +1,4 @@
-import { DashboardRecordResultItem, DashboardResp, modelCountThisMonth } from '@/lib/backend/paramAndResp';
+import { DashboardRecordResultItem, modelCountThisMonth } from '@/lib/backend/paramAndResp';
 import { Model, ModelStatic, Op, literal } from 'sequelize';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Resp, suc } from '@/lib/resp';
@@ -60,6 +60,51 @@ function getDashboardRecordResultItems(
   return res;
 }
 
+/** TODO: 能否去掉子查询，从而不写业务代码
+SELECT `count` AS `name`, COUNT(*) AS `value` FROM (
+  SELECT `word`.`word`, COUNT(*) AS `count` FROM word INNER JOIN (synonym AS `itsSynonyms->synonym` INNER JOIN word AS itsSynonyms ON `itsSynonyms`.`word` = `itsSynonyms->synonym`.`rhs`) ON `word`.`word` = `itsSynonyms->synonym`.`lhs` GROUP BY word
+) AS tmp GROUP BY tmp.count
+ */
+async function getSynonymCount() {
+  const synonymRes = await word.count({
+    attributes: [
+      'word',
+      [literal('COUNT(*)'), 'count']
+    ],
+    group: 'word',
+    include: [{ association: 'itsSynonyms', required: true }]
+  });
+  const wordTotal = await word.count();
+  const noSynonymWordCount = wordTotal - synonymRes.length;
+  const mp = synonymRes.reduce((mp, { count }) => {
+    const v = mp.get(count) || 0;
+    mp.set(count, v + 1);
+    return mp;
+  }, new Map<number, number>([[0, noSynonymWordCount]]));
+  const res = Array.from(mp.entries()).map(([k, value]) => ({ name: String(k), value }));
+  return res;
+}
+
+async function getSentenceCountOfWord() {
+  const sentenceRes = await word.count({
+    attributes: [
+      'word',
+      [literal('COUNT(*)'), 'count']
+    ],
+    group: 'word',
+    include: [{ model: sentence, required: true }]
+  });
+  const wordTotal = await word.count();
+  const noSentenceWordCount = wordTotal - sentenceRes.length;
+  const mp = sentenceRes.reduce((mp, { count }) => {
+    const v = mp.get(count) || 0;
+    mp.set(count, v + 1);
+    return mp;
+  }, new Map<number, number>([[0, noSentenceWordCount]]));
+  const res = Array.from(mp.entries()).map(([k, value]) => ({ name: String(k), value }));
+  return res;
+}
+
 const router = createRouter<NextApiRequest, NextApiResponse<Resp>>();
 
 router.get(async(req, res) => {
@@ -73,22 +118,30 @@ router.get(async(req, res) => {
   const cnWordResultData = getDashboardRecordResultItems(cnWordCtimeResult.result, cnWordMtimeResult.result);
   const sentenceResultData = getDashboardRecordResultItems(sentenceCtimeResult.result, sentenceMtimeResult.result);
 
+  const synonymCount = await getSynonymCount();
+
+  const sentenceCountOfWord = await getSentenceCountOfWord();
+
   res.status(200).json(suc({
-    cnWord: {
-      data: cnWordResultData,
-      learn: cnWordCtimeResult.total,
-      learnOrReview: cnWordMtimeResult.total
+    recordCount: {
+      cnWord: {
+        data: cnWordResultData,
+        learn: cnWordCtimeResult.total,
+        learnOrReview: cnWordMtimeResult.total
+      },
+      sentence: {
+        data: sentenceResultData,
+        learn: sentenceCtimeResult.total,
+        learnOrReview: sentenceMtimeResult.total
+      },
+      word: {
+        data: wordResultData,
+        learn: wordCtimeResult.total,
+        learnOrReview: wordMtimeResult.total
+      }
     },
-    sentence: {
-      data: sentenceResultData,
-      learn: sentenceCtimeResult.total,
-      learnOrReview: sentenceMtimeResult.total
-    },
-    word: {
-      data: wordResultData,
-      learn: wordCtimeResult.total,
-      learnOrReview: wordMtimeResult.total
-    }
+    sentenceCountOfWord,
+    synonymCount
   }));
 });
 

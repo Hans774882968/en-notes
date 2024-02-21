@@ -4,16 +4,20 @@ import { UpdateSentenceParams } from '@/lib/backend/paramAndResp';
 import { createRouter } from 'next-connect';
 import { fail, suc } from '@/lib/resp';
 import { sentence } from '@/db/models';
+import { sentenceIdValidatorSchema } from '@/lib/backend/paramValidators';
 import { validateReq } from '@/middlewares/validateReq';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
 router.post(
   validateReq<UpdateSentenceParams>({
+    keywordObjects: [
+      sentenceIdValidatorSchema
+    ],
     schema: {
       additionalProperties: false,
       properties: {
-        id: { type: 'string' },
+        id: { sentenceIdLegal: null, type: ['number', 'string'] },
         note: { type: 'string' },
         sentence: { type: 'string' }
       },
@@ -23,7 +27,7 @@ router.post(
   }),
   async(req, res) => {
     let { id, note, sentence: sentenceData } = req.body;
-    id = id.trim();
+    id = id.toString().trim();
     sentenceData = sentenceData.trim();
     note = note.trim();
     try {

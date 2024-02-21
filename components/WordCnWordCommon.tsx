@@ -4,6 +4,7 @@ import { DefaultOptionType } from 'antd/lib/select';
 import { ReactNode, useState } from 'react';
 import { Store } from 'antd/lib/form/interface';
 import { ctrlSAction, preventAccidentSubmitAction } from '@/lib/frontend/keydownActions';
+import { useBeforeUnload } from 'react-use';
 import { useDebouncedCallback } from 'use-debounce';
 import AutoComplete from 'antd/lib/auto-complete';
 import Button from 'antd/lib/button';
@@ -32,10 +33,6 @@ interface Props {
 
 type EditWordForm = {
   note: string
-};
-
-const rules = {
-  note: [{ message: 'note should not be empty', required: true }]
 };
 
 function ModeField({ stateText }: { stateText: string }) {
@@ -84,9 +81,29 @@ export default function WordCnWordCommon({
 
   const [wordSearchKey, setWordSearchKey] = useState('');
 
+  const [originalNote, setOriginalNote] = useState('');
+
+  // TODO: 点击菜单切换 URL 时也要拦截
+  const isNoteChanged = noteFieldValue !== originalNote;
+  useBeforeUnload(isNoteChanged, 'Changes you have made to the Note field may not be saved');
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const shouldShowNoteField = !isSearchWordState;
-  const canNotSubmit = isSearchWordState || !noteFieldValue || isSubmitting;
+  const canNotSubmit = isSearchWordState || !noteFieldValue || !isNoteChanged || isSubmitting;
+
+  const rules = {
+    note: [
+      { message: 'note should not be empty', required: true },
+      {
+        validator: (_: object, value: string) => {
+          if (originalNote === value) {
+            return Promise.reject(new Error('note should be modified'));
+          }
+          return Promise.resolve();
+        }
+      }
+    ]
+  };
 
   const preventAccidentSubmit = preventAccidentSubmitAction();
 
@@ -118,11 +135,13 @@ export default function WordCnWordCommon({
     if (!word) {
       clearFieldsExceptWordKey();
       changeToCreateWordState();
+      setOriginalNote('');
       return;
     }
     changeToUpdateWordState();
     afterGetWord(word);
     editWordForm.setFieldValue('note', word.note);
+    setOriginalNote(word.note);
   };
 
   const mdEditorKeyDown = ctrlSAction(() => editWordForm.submit());
@@ -182,7 +201,10 @@ export default function WordCnWordCommon({
           {
             shouldShowNoteField && (
               <Form.Item label="Note" name="note" rules={rules.note}>
-                <MarkdownEditor onKeyDown={mdEditorKeyDown} />
+                <MarkdownEditor
+                  onKeyDown={mdEditorKeyDown}
+                  highlightBorder={isNoteChanged}
+                />
               </Form.Item>
             )
           }

@@ -29,26 +29,33 @@ function TotalCard({
   );
 }
 
-function useRecordCountThisMonth() {
+function useDashboard() {
   const { data, isLoading } = useSWR(
-    '/api/dashboard/recordCountThisMonth',
+    '/api/dashboard/dashboard',
     (url) => Request.get<DashboardResp>({ url })
   );
-  const wordLearn = data?.word.learn || 0;
-  const wordLearnOrReview = data?.word.learnOrReview || 0;
-  const wordDateArr = data?.word.data.map((item) => item.date) || [];
-  const wordLearnArr = data?.word.data.map((item) => item.learn) || [];
-  const wordLearnOrReviewArr = data?.word.data.map((item) => item.learnOrReview) || [];
-  const cnWordLearn = data?.cnWord.learn || 0;
-  const cnWordLearnOrReview = data?.cnWord.learnOrReview || 0;
-  const cnWordDateArr = data?.cnWord.data.map((item) => item.date) || [];
-  const cnWordLearnArr = data?.cnWord.data.map((item) => item.learn) || [];
-  const cnWordLearnOrReviewArr = data?.cnWord.data.map((item) => item.learnOrReview) || [];
-  const sentenceLearn = data?.sentence.learn || 0;
-  const sentenceLearnOrReview = data?.sentence.learnOrReview || 0;
-  const sentenceDateArr = data?.sentence.data.map((item) => item.date) || [];
-  const sentenceLearnArr = data?.sentence.data.map((item) => item.learn) || [];
-  const sentenceLearnOrReviewArr = data?.sentence.data.map((item) => item.learnOrReview) || [];
+
+  const recordCount = data?.recordCount;
+  const wordLearn = recordCount?.word.learn || 0;
+  const wordLearnOrReview = recordCount?.word.learnOrReview || 0;
+  const wordDateArr = recordCount?.word.data.map((item) => item.date) || [];
+  const wordLearnArr = recordCount?.word.data.map((item) => item.learn) || [];
+  const wordLearnOrReviewArr = recordCount?.word.data.map((item) => item.learnOrReview) || [];
+  const cnWordLearn = recordCount?.cnWord.learn || 0;
+  const cnWordLearnOrReview = recordCount?.cnWord.learnOrReview || 0;
+  const cnWordDateArr = recordCount?.cnWord.data.map((item) => item.date) || [];
+  const cnWordLearnArr = recordCount?.cnWord.data.map((item) => item.learn) || [];
+  const cnWordLearnOrReviewArr = recordCount?.cnWord.data.map((item) => item.learnOrReview) || [];
+  const sentenceLearn = recordCount?.sentence.learn || 0;
+  const sentenceLearnOrReview = recordCount?.sentence.learnOrReview || 0;
+  const sentenceDateArr = recordCount?.sentence.data.map((item) => item.date) || [];
+  const sentenceLearnArr = recordCount?.sentence.data.map((item) => item.learn) || [];
+  const sentenceLearnOrReviewArr = recordCount?.sentence.data.map((item) => item.learnOrReview) || [];
+
+  const synonymCount = data?.synonymCount || [];
+
+  const sentenceCountOfWord = data?.sentenceCountOfWord || [];
+
   return {
     cnWordDateArr,
     cnWordLearn,
@@ -56,11 +63,13 @@ function useRecordCountThisMonth() {
     cnWordLearnOrReview,
     cnWordLearnOrReviewArr,
     isLoading,
+    sentenceCountOfWord,
     sentenceDateArr,
     sentenceLearn,
     sentenceLearnArr,
     sentenceLearnOrReview,
     sentenceLearnOrReviewArr,
+    synonymCount,
     wordDateArr,
     wordLearn,
     wordLearnArr,
@@ -83,14 +92,16 @@ function Dashboard() {
     sentenceDateArr,
     sentenceLearn,
     sentenceLearnArr,
+    sentenceCountOfWord,
     sentenceLearnOrReview,
     sentenceLearnOrReviewArr,
     wordDateArr,
     wordLearn,
     wordLearnArr,
     wordLearnOrReview,
-    wordLearnOrReviewArr
-  } = useRecordCountThisMonth();
+    wordLearnOrReviewArr,
+    synonymCount
+  } = useDashboard();
 
   const getStatisticsOption = (
     model: string,
@@ -146,6 +157,37 @@ function Dashboard() {
   const cnWordOption = getStatisticsOption('English topic', cnWordDateArr, cnWordLearnArr, cnWordLearnOrReviewArr);
   const sentenceOption = getStatisticsOption('sentence', sentenceDateArr, sentenceLearnArr, sentenceLearnOrReviewArr);
 
+  const getPieChartOption = (dataArr: unknown[], titleText: string) => ({
+    legend: {
+      orient: 'vertical',
+      x: 'right',
+      y: 'top'
+    },
+    series: [
+      {
+        data: dataArr,
+        label: {
+          normal: {
+            formatter: '{b}: {c} ({d}%)'
+          }
+        },
+        radius: [0, '70%'],
+        type: 'pie'
+      }
+    ],
+    title: {
+      left: 'center',
+      text: titleText
+    },
+    tooltip: {
+      trigger: 'item'
+    }
+  });
+
+  const synonymCountOption = getPieChartOption(synonymCount, 'Statistics on the number of synonyms per word');
+
+  const sentenceCountOfWordOption = getPieChartOption(sentenceCountOfWord, 'Statistics on the number of sentences per word');
+
   return (
     <div className={styles.dashboard}>
       <Row gutter={16}>
@@ -163,6 +205,10 @@ function Dashboard() {
         <ReactEcharts option={wordOption} theme={mdEditorThemeName} />
         <ReactEcharts option={cnWordOption} theme={mdEditorThemeName} />
         <ReactEcharts option={sentenceOption} theme={mdEditorThemeName} />
+      </div>
+      <div className={styles.pieCharts}>
+        <ReactEcharts className={styles.pieChart} option={synonymCountOption} theme={mdEditorThemeName} />
+        <ReactEcharts className={styles.pieChart} option={sentenceCountOfWordOption} theme={mdEditorThemeName} />
       </div>
     </div>
   );

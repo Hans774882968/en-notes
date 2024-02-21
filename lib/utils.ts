@@ -29,3 +29,8 @@ export const removeFalsyAttrs = (o: object) => {
 export const isNonEmptyArray = (a: unknown) => {
   return Array.isArray(a) && a.length > 0;
 };
+
+export const getLineCount = (s: unknown) => {
+  if (!s) return 1;
+  return (String(s).match(/\n/g) || '').length + 1;
+};
