@@ -80,7 +80,12 @@ export type GetWordListParams = TableParams<{
   mtime?: string[]
 }>;
 
-export type GetWordListResp = TableResp<Word>;
+export type WordTableItem = Word & {
+  complexity: number
+  synonymCount: number
+};
+
+export type GetWordListResp = TableResp<WordTableItem>;
 
 export type UpsertWordResp = {
   created: boolean
@@ -134,14 +139,21 @@ export type RecordCountThisMonthResp = {
   data: DashboardRecordResultItem[]
 };
 
-export type pieChartItem = {
+export type PieChartItem = {
   name: string
   value: number
 };
 
-export type SynonymCountResp = Array<pieChartItem>;
+export type SynonymCountResp = Array<PieChartItem>;
 
-export type SentenceCountOfWordResp = Array<pieChartItem>;
+export type SentenceCountOfWordResp = Array<PieChartItem>;
+
+export type WordCountOfSentenceResp = Array<PieChartItem>;
+
+export type ComplexityResp = {
+  ranges: string[]
+  values: number[]
+};
 
 export type DashboardResp = {
   recordCount: {
@@ -151,4 +163,8 @@ export type DashboardResp = {
   }
   synonymCount: SynonymCountResp
   sentenceCountOfWord: SentenceCountOfWordResp
+  wordCountOfSentence: WordCountOfSentenceResp
+  wordComplexity: ComplexityResp
+  sentenceComplexity: ComplexityResp
+  cnWordComplexity: ComplexityResp
 };

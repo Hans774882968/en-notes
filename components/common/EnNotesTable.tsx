@@ -244,7 +244,7 @@ const EnNotesTable = forwardRef<TableRef, TableProps>(
     /**
      * @useImperativeHandle
      * 第一个参数，接收一个通过forwardRef引用父组件的ref实例
-     * 第二个参数一个回调函数，返回一个对象，对象里面存储需要暴露给父组件的属性或方法
+     * 第二个参数，一个回调函数，返回一个对象，对象里面存储需要暴露给父组件的属性或方法
      */
     useImperativeHandle(ref, () => ({
       // 获取当前列表数据

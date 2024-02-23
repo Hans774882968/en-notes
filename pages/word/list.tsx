@@ -40,6 +40,16 @@ export default function List() {
       title: 'Word'
     },
     {
+      dataIndex: 'complexity',
+      key: 'complexity',
+      title: 'Complexity'
+    },
+    {
+      dataIndex: 'synonymCount',
+      key: 'synonymCount',
+      title: 'Number of Synonyms'
+    },
+    {
       dataIndex: 'ctime',
       key: 'ctime',
       title: 'Create Time'
@@ -56,6 +66,7 @@ export default function List() {
     }
   ];
 
+  // 这里 RangePicker 等组件不得不手动加 100% 去对齐输入框
   const searchConfigList = [
     {
       key: 'word',
@@ -70,12 +81,12 @@ export default function List() {
     {
       key: 'ctime',
       label: 'Create Time',
-      slot: <RangePicker />
+      slot: <RangePicker style={{ width: '100%' }} />
     },
     {
       key: 'mtime',
       label: 'Modify Time',
-      slot: <RangePicker />
+      slot: <RangePicker style={{ width: '100%' }} />
     }
   ];
 

@@ -1,4 +1,4 @@
-import { DashboardResp } from '@/lib/backend/paramAndResp';
+import { DashboardResp, PieChartItem } from '@/lib/backend/paramAndResp';
 import { useThemeContext } from '@/components/ThemeContext';
 import Card from 'antd/lib/card';
 import Col from 'antd/lib/col';
@@ -56,13 +56,21 @@ function useDashboard() {
 
   const sentenceCountOfWord = data?.sentenceCountOfWord || [];
 
+  const wordCountOfSentence = data?.wordCountOfSentence || [];
+
+  const wordComplexity = data?.wordComplexity || { ranges: [], values: [] };
+  const sentenceComplexity = data?.sentenceComplexity || { ranges: [], values: [] };
+  const cnWordComplexity = data?.cnWordComplexity || { ranges: [], values: [] };
+
   return {
+    cnWordComplexity,
     cnWordDateArr,
     cnWordLearn,
     cnWordLearnArr,
     cnWordLearnOrReview,
     cnWordLearnOrReviewArr,
     isLoading,
+    sentenceComplexity,
     sentenceCountOfWord,
     sentenceDateArr,
     sentenceLearn,
@@ -70,6 +78,8 @@ function useDashboard() {
     sentenceLearnOrReview,
     sentenceLearnOrReviewArr,
     synonymCount,
+    wordComplexity,
+    wordCountOfSentence,
     wordDateArr,
     wordLearn,
     wordLearnArr,
@@ -100,12 +110,16 @@ function Dashboard() {
     wordLearnArr,
     wordLearnOrReview,
     wordLearnOrReviewArr,
-    synonymCount
+    synonymCount,
+    wordCountOfSentence,
+    wordComplexity,
+    sentenceComplexity,
+    cnWordComplexity
   } = useDashboard();
 
   const getStatisticsOption = (
     model: string,
-    dateArr: unknown[],
+    dateArr: string[],
     learnArr: number[],
     learnOrReviewArr: number[]
   ) => ({
@@ -136,7 +150,7 @@ function Dashboard() {
     ],
     title: {
       left: 'center',
-      text: `Statistics of ${model}s this month`
+      text: `Statistics of ${model}s This Month`
     },
     tooltip: {
       axisPointer: {
@@ -153,11 +167,11 @@ function Dashboard() {
     }
   });
 
-  const wordOption = getStatisticsOption('word', wordDateArr, wordLearnArr, wordLearnOrReviewArr);
-  const cnWordOption = getStatisticsOption('English topic', cnWordDateArr, cnWordLearnArr, cnWordLearnOrReviewArr);
-  const sentenceOption = getStatisticsOption('sentence', sentenceDateArr, sentenceLearnArr, sentenceLearnOrReviewArr);
+  const wordOption = getStatisticsOption('Word', wordDateArr, wordLearnArr, wordLearnOrReviewArr);
+  const cnWordOption = getStatisticsOption('English Topic', cnWordDateArr, cnWordLearnArr, cnWordLearnOrReviewArr);
+  const sentenceOption = getStatisticsOption('Sentence', sentenceDateArr, sentenceLearnArr, sentenceLearnOrReviewArr);
 
-  const getPieChartOption = (dataArr: unknown[], titleText: string) => ({
+  const getPieChartOption = (dataArr: PieChartItem[], titleText: string) => ({
     legend: {
       orient: 'vertical',
       x: 'right',
@@ -167,9 +181,7 @@ function Dashboard() {
       {
         data: dataArr,
         label: {
-          normal: {
-            formatter: '{b}: {c} ({d}%)'
-          }
+          formatter: '{b}: {c} ({d}%)'
         },
         radius: [0, '70%'],
         type: 'pie'
@@ -184,21 +196,105 @@ function Dashboard() {
     }
   });
 
-  const synonymCountOption = getPieChartOption(synonymCount, 'Statistics on the number of synonyms per word');
+  const synonymCountOption = getPieChartOption(synonymCount, 'Statistics on the Number of Synonyms Per Word');
 
-  const sentenceCountOfWordOption = getPieChartOption(sentenceCountOfWord, 'Statistics on the number of sentences per word');
+  const sentenceCountOfWordOption = getPieChartOption(sentenceCountOfWord, 'Statistics on the Number of Sentences Per Word');
+
+  const wordCountOfSentenceOption = getPieChartOption(wordCountOfSentence, 'Statistics on the Number of Word Per Sentence');
+
+  const getComplexityOption = (xData: string[], yData: number[], title: string, subTitle: string) => ({
+    grid: {
+      top: 70
+    },
+    legend: {
+      orient: 'vertical',
+      x: 'right',
+      y: 'top'
+    },
+    series: [
+      {
+        data: yData,
+        label: {
+          position: 'top',
+          show: true
+        },
+        type: 'bar'
+      }
+    ],
+    title: {
+      left: 'center',
+      subtext: subTitle,
+      text: title
+    },
+    tooltip: {
+      axisPointer: {
+        type: 'cross'
+      },
+      trigger: 'axis'
+    },
+    xAxis: {
+      axisLabel: {
+        interval: 0
+      },
+      axisLine: {
+        show: true,
+        symbol: ['none', 'arrow'],
+        symbolOffset: [0, 7],
+        symbolSize: [8, 8]
+      },
+      axisTick: {
+        inside: true,
+        show: true
+      },
+      data: xData,
+      type: 'category'
+    },
+    yAxis: {
+      axisLine: {
+        show: true,
+        symbol: ['none', 'arrow'],
+        symbolOffset: [0, 7],
+        symbolSize: [8, 8]
+      },
+      axisTick: {
+        inside: true,
+        show: true
+      },
+      name: 'Count',
+      type: 'value'
+    }
+  });
+
+  const wordComplexityOption = getComplexityOption(
+    wordComplexity.ranges,
+    wordComplexity.values,
+    'Word Complexity',
+    '(len(note) + sum(len(sentences[i].sentence)))'
+  );
+  const sentenceComplexityOption = getComplexityOption(
+    sentenceComplexity.ranges,
+    sentenceComplexity.values,
+    'Sentence Complexity',
+    '(len(sentence) + len(note))'
+  );
+  const cnWordComplexityOption = getComplexityOption(
+    cnWordComplexity.ranges,
+    cnWordComplexity.values,
+    'English Topic Complexity',
+    '(len(title) + len(note))'
+  );
 
   return (
-    <div className={styles.dashboard}>
+    <div className={styles.dashboard} >
       <Row gutter={16}>
         <Col span={8}>
-          <TotalCard title="words" learn={wordLearn} learnOrReview={wordLearnOrReview} />
+          <TotalCard title="Words" learn={wordLearn} learnOrReview={wordLearnOrReview} />
         </Col>
         <Col span={8}>
-          <TotalCard title="English topics" learn={cnWordLearn} learnOrReview={cnWordLearnOrReview} />
+          <TotalCard title="English Topics" learn={cnWordLearn} learnOrReview={cnWordLearnOrReview} />
         </Col>
         <Col span={8}>
-          <TotalCard title="sentences" learn={sentenceLearn} learnOrReview={sentenceLearnOrReview} />
+          <TotalCard title="Sentences" learn={sentenceLearn} learnOrReview={sentenceLearnOrReview} />
         </Col>
       </Row>
       <div>
@@ -206,9 +302,17 @@ function Dashboard() {
         <ReactEcharts option={cnWordOption} theme={mdEditorThemeName} />
         <ReactEcharts option={sentenceOption} theme={mdEditorThemeName} />
       </div>
-      <div className={styles.pieCharts}>
-        <ReactEcharts className={styles.pieChart} option={synonymCountOption} theme={mdEditorThemeName} />
-        <ReactEcharts className={styles.pieChart} option={sentenceCountOfWordOption} theme={mdEditorThemeName} />
+      <div className={styles.charts}>
+        <ReactEcharts className={styles.chart} option={synonymCountOption} theme={mdEditorThemeName} />
+        <ReactEcharts className={styles.chart} option={sentenceCountOfWordOption} theme={mdEditorThemeName} />
+      </div>
+      <div className={styles.charts}>
+        <ReactEcharts className={styles.chart} option={wordCountOfSentenceOption} theme={mdEditorThemeName} />
+        <ReactEcharts className={styles.chart} option={wordComplexityOption} theme={mdEditorThemeName} />
+      </div>
+      <div className={styles.charts}>
+        <ReactEcharts className={styles.chart} option={sentenceComplexityOption} theme={mdEditorThemeName} />
+        <ReactEcharts className={styles.chart} option={cnWordComplexityOption} theme={mdEditorThemeName} />
       </div>
     </div>
   );
