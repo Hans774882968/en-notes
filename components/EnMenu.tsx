@@ -1,4 +1,5 @@
 import { Key, ReactNode, useState } from 'react';
+import { urls } from '@/lib/frontend/urls';
 import { useRouter } from 'next/router';
 import AppstoreOutlined from '@ant-design/icons/AppstoreOutlined';
 import DashboardOutlined from '@ant-design/icons/DashboardOutlined';
@@ -28,17 +29,17 @@ function getItem(
 
 const items: MenuProps['items'] = [
   getItem('Word', '1-1', <AppstoreOutlined />, [
-    getItem('Edit', '/word/word', <EditOutlined />),
-    getItem('List', '/word/list', <TableOutlined />),
-    getItem('Word Settings', '/word/word-settings', <SettingOutlined />)
+    getItem('Edit', urls.word.edit, <EditOutlined />),
+    getItem('List', urls.word.list, <TableOutlined />),
+    getItem('Word Settings', urls.word.settings, <SettingOutlined />)
   ]),
-  getItem('English Topic', '/cn-word', <EditOutlined />),
+  getItem('English Topic', urls.cnWord.edit, <EditOutlined />),
   getItem('Sentence', '1-3', <AppstoreOutlined />, [
-    getItem('Create', '/sentence/create', <EditOutlined />),
-    getItem('Edit', '/sentence/edit', <EditOutlined />)
+    getItem('Create', urls.sentence.create, <EditOutlined />),
+    getItem('Edit', urls.sentence.edit, <EditOutlined />)
   ]),
-  getItem('Export', '/export', <ExportOutlined />),
-  getItem('Dashboard', '/dashboard', <DashboardOutlined />)
+  getItem('Export', urls.export.index, <ExportOutlined />),
+  getItem('Dashboard', urls.dashboard.index, <DashboardOutlined />)
 ];
 
 function collectAllKeys(currentItems: MenuProps['items'], a: string[]) {

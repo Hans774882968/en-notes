@@ -8,8 +8,10 @@ import { useBeforeUnload } from 'react-use';
 import { useDebouncedCallback } from 'use-debounce';
 import AutoComplete from 'antd/lib/auto-complete';
 import Button from 'antd/lib/button';
+import EditPageSkeleton from './EditPageSkeleton';
 import EnLayout from './EnLayout';
 import Form, { FormInstance } from 'antd/lib/form';
+import LoadingInContainer from './common/LoadingInContainer';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import Message from 'antd/lib/message';
 import QuestionCircleOutlined from '@ant-design/icons/QuestionCircleOutlined';
@@ -71,12 +73,15 @@ export default function WordCnWordCommon({
   upsertRequest
 }: Props) {
   const {
-    isSearchWordState,
-    isUpdateWordState,
-    changeToCreateWordState,
-    changeToSearchWordState,
-    changeToUpdateWordState,
-    stateText
+    isFetchingOptionsState,
+    isUpdateState,
+    isFetchRecordState,
+    changeToCreateState,
+    changeToSearchState,
+    changeToUpdateState,
+    changeToFetchRecordState,
+    stateText,
+    isCreateOrUpdateState
   } = useCreateUpdateStateMachine();
 
   const [wordSearchKey, setWordSearchKey] = useState('');
@@ -88,8 +93,8 @@ export default function WordCnWordCommon({
   useBeforeUnload(isNoteChanged, 'Changes you have made to the Note field may not be saved');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const shouldShowNoteField = !isSearchWordState;
-  const canNotSubmit = isSearchWordState || !noteFieldValue || !isNoteChanged || isSubmitting;
+  const shouldShowNoteField = isCreateOrUpdateState;
+  const canNotSubmit = !isCreateOrUpdateState || !noteFieldValue || !isNoteChanged || isSubmitting;
 
   const rules = {
     note: [
@@ -118,9 +123,10 @@ export default function WordCnWordCommon({
   );
 
   const getWord = async () => {
-    changeToSearchWordState();
+    changeToFetchRecordState();
     if (!wordSearchKey) {
       clearFieldsExceptWordKey();
+      changeToSearchState();
       return;
     }
     let word: Word | CnWord | null = null;
@@ -129,16 +135,16 @@ export default function WordCnWordCommon({
     } catch (e) {
       Message.error({ content: 'get info failed' });
       clearFieldsExceptWordKey();
-      changeToSearchWordState();
+      changeToSearchState();
       return;
     }
     if (!word) {
       clearFieldsExceptWordKey();
-      changeToCreateWordState();
+      changeToCreateState();
       setOriginalNote('');
       return;
     }
-    changeToUpdateWordState();
+    changeToUpdateState();
     afterGetWord(word);
     editWordForm.setFieldValue('note', word.note);
     setOriginalNote(word.note);
@@ -193,10 +199,13 @@ export default function WordCnWordCommon({
               onSearch={debounceHandleWordSearch}
               onBlur={getWord}
               onInputKeyDown={(e) => preventAccidentSubmit(e)}
+              notFoundContent={isFetchingOptionsState ? <LoadingInContainer /> : null}
             />
           </Form.Item>
 
-          {isUpdateWordState && readOnlyInfo}
+          {isFetchRecordState && <EditPageSkeleton fieldCountBeforeNoteField={4} />}
+
+          {isUpdateState && readOnlyInfo}
 
           {
             shouldShowNoteField && (

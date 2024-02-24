@@ -2,7 +2,7 @@ import { GetWordListParams } from '@/lib/backend/paramAndResp';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Op } from 'sequelize';
 import { Resp, suc } from '@/lib/resp';
-import { calcWordComplexity } from '@/db/recordComplexity';
+import { calcWordComplexity } from '@/db/modelComplexity';
 import { createRouter } from 'next-connect';
 import { removeFalsyAttrs } from '@/lib/utils';
 import { sentence, word } from '@/db/models';

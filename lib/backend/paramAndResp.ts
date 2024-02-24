@@ -102,7 +102,7 @@ export type UpsertCnWordResp = {
 };
 
 export type GetSentenceParams = {
-  sentence: string
+  sentence: SentenceIdType
 };
 
 export type GetSentenceResp = {
@@ -155,6 +155,13 @@ export type ComplexityResp = {
   values: number[]
 };
 
+export type NewTextWrittenResp = {
+  dates: string[]
+  wordNewWrittenTotals: number[]
+  cnWordNewWrittenTotals: number[]
+  sentenceNewWrittenTotals: number[]
+};
+
 export type DashboardResp = {
   recordCount: {
     word: RecordCountThisMonthResp
@@ -167,4 +174,5 @@ export type DashboardResp = {
   wordComplexity: ComplexityResp
   sentenceComplexity: ComplexityResp
   cnWordComplexity: ComplexityResp
+  newTextWritten: NewTextWrittenResp
 };

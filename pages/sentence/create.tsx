@@ -23,8 +23,8 @@ const rules = {
 
 export default function Create() {
   const [createSentenceForm] = Form.useForm<CreateSentenceForm>();
-  const sentenceFieldValue = Form.useWatch('sentence', createSentenceForm);
-  const noteFieldValue = Form.useWatch('note', createSentenceForm);
+  const sentenceFieldValue = Form.useWatch('sentence', createSentenceForm) || '';
+  const noteFieldValue = Form.useWatch('note', createSentenceForm) || '';
   const initialValue = {
     note: '',
     sentence: ''

@@ -1,20 +1,13 @@
-import { useThemeContext } from './ThemeContext';
 import Col from 'antd/lib/col';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useEffect } from 'react';
+import React from 'react';
 import Row from 'antd/lib/row';
-import Switch from 'antd/lib/switch';
+import ThemeBtn from './ThemeBtn';
 import icon48 from '@/assets/icon48.png';
 import styles from './Navbar.module.scss';
 
 const Navbar: React.FC = () => {
-  const { preferDarkTheme, preferDarkThemeSetter, mdEditorThemeName } = useThemeContext()!;
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-color-mode', mdEditorThemeName);
-  }, [mdEditorThemeName]);
-
   return (
     <header>
       <Row className={styles.navbar}>
@@ -27,13 +20,7 @@ const Navbar: React.FC = () => {
         </Col>
 
         <Col className={styles.navbarCol}>
-          <Switch
-            value={preferDarkTheme}
-            checkedChildren="dark"
-            unCheckedChildren="light"
-            defaultChecked={preferDarkTheme}
-            onChange={preferDarkThemeSetter}
-          />
+          <ThemeBtn />
         </Col>
       </Row>
     </header>

@@ -1,0 +1,9 @@
+@import '../../styles/theme.scss';
+
+.container {
+  cursor: pointer;
+
+  @include useTheme {
+    color: getThemeVar('textColor')
+  }
+}

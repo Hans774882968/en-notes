@@ -1,5 +1,5 @@
 import { ComplexityResp } from '../../paramAndResp';
-import { calcCnWordComplexity, calcSentenceComplexity, calcWordComplexity } from '@/db/recordComplexity';
+import { calcCnWordComplexity, calcSentenceComplexity, calcWordComplexity } from '@/db/modelComplexity';
 import { cnWord, sentence, word } from '@/db/models';
 
 const wordIntervals = [0, 100, 200, 500, 1000, Infinity];

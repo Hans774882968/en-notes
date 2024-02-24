@@ -4,8 +4,10 @@ import { formLayout } from '@/lib/const';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import Form from 'antd/lib/form';
+import LoadingInContainer from '../common/LoadingInContainer';
 import MarkdownPreviewer from '../MarkdownPreviewer';
 import Modal, { ModalProps } from 'antd/lib/modal';
+import NoSynonymsRecorded from './NoSynonymsRecorded';
 import Request from '@/lib/frontend/request';
 import SentencesItem from './SentencesItem';
 import useSWR from 'swr';
@@ -63,7 +65,7 @@ export function WordInfoDialog({ word, open, onCancel, externalData }: Props) {
     wordRecord?.itsSynonyms.map(({ word }) => (
       <Button key={word} type="link" onClick={() => openNextDialog(word)}>{word}</Button>
     ))
-  ) : <span>No synonyms recorded yet</span>;
+  ) : <NoSynonymsRecorded />;
 
   return (
     <>
@@ -84,7 +86,7 @@ export function WordInfoDialog({ word, open, onCancel, externalData }: Props) {
         footer={[]}
       >
         {
-          !wordRecord ? <span>No data</span> : (
+          !wordRecord ? <LoadingInContainer /> : (
             <Form {...formLayout}>
               <Form.Item label="Synonyms">
                 {synonymsNode}

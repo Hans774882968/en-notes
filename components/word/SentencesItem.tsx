@@ -1,15 +1,16 @@
-import { Sentence } from '@/db/models/types';
+import { Sentence, SentenceIdType } from '@/db/models/types';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import Form from 'antd/lib/form';
+import NoSentencesRecorded from './NoSentencesRecorded';
 import SentenceInfoDialog from './SentenceInfoDialog';
 
 export default function SentencesItem({ sentences }: { sentences: Sentence[] }) {
-  const [currentSentenceId, setCurrentSentenceId] = useState('');
+  const [currentSentenceId, setCurrentSentenceId] = useState<SentenceIdType>('');
   const [currentSentence, setCurrentSentence] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openDialog = (sentenceId: string, sentence: string) => {
+  const openDialog = (sentenceId: SentenceIdType, sentence: string) => {
     setCurrentSentenceId(sentenceId);
     setCurrentSentence(sentence);
     setIsModalOpen(true);
@@ -29,7 +30,7 @@ export default function SentencesItem({ sentences }: { sentences: Sentence[] }) 
       />
       <Form.Item label="Sentences">
         {
-          !sentences.length ? <span>No sentences recorded yet</span> : (
+          !sentences.length ? <NoSentencesRecorded /> : (
             <ol>
               {
                 sentences.map(({ id: sentenceId, sentence }) => {

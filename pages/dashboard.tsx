@@ -1,4 +1,5 @@
 import { DashboardResp, PieChartItem } from '@/lib/backend/paramAndResp';
+import { ECHARTS_AXIS_ARROW_CONFIG } from '@/lib/const';
 import { useThemeContext } from '@/components/ThemeContext';
 import Card from 'antd/lib/card';
 import Col from 'antd/lib/col';
@@ -62,6 +63,8 @@ function useDashboard() {
   const sentenceComplexity = data?.sentenceComplexity || { ranges: [], values: [] };
   const cnWordComplexity = data?.cnWordComplexity || { ranges: [], values: [] };
 
+  const newTextWritten = data?.newTextWritten || { cnWordNewWrittenTotals: [], dates: [], sentenceNewWrittenTotals: [], wordNewWrittenTotals: [] };
+
   return {
     cnWordComplexity,
     cnWordDateArr,
@@ -70,6 +73,7 @@ function useDashboard() {
     cnWordLearnOrReview,
     cnWordLearnOrReviewArr,
     isLoading,
+    newTextWritten,
     sentenceComplexity,
     sentenceCountOfWord,
     sentenceDateArr,
@@ -114,7 +118,8 @@ function Dashboard() {
     wordCountOfSentence,
     wordComplexity,
     sentenceComplexity,
-    cnWordComplexity
+    cnWordComplexity,
+    newTextWritten
   } = useDashboard();
 
   const getStatisticsOption = (
@@ -202,7 +207,7 @@ function Dashboard() {
 
   const wordCountOfSentenceOption = getPieChartOption(wordCountOfSentence, 'Statistics on the Number of Word Per Sentence');
 
-  const getComplexityOption = (xData: string[], yData: number[], title: string, subTitle: string) => ({
+  const getComplexityOption = (xData: string[], yData: number[], titleText: string, subTitleText: string) => ({
     grid: {
       top: 70
     },
@@ -223,8 +228,8 @@ function Dashboard() {
     ],
     title: {
       left: 'center',
-      subtext: subTitle,
-      text: title
+      subtext: subTitleText,
+      text: titleText
     },
     tooltip: {
       axisPointer: {
@@ -236,32 +241,14 @@ function Dashboard() {
       axisLabel: {
         interval: 0
       },
-      axisLine: {
-        show: true,
-        symbol: ['none', 'arrow'],
-        symbolOffset: [0, 7],
-        symbolSize: [8, 8]
-      },
-      axisTick: {
-        inside: true,
-        show: true
-      },
       data: xData,
-      type: 'category'
+      type: 'category',
+      ...ECHARTS_AXIS_ARROW_CONFIG
     },
     yAxis: {
-      axisLine: {
-        show: true,
-        symbol: ['none', 'arrow'],
-        symbolOffset: [0, 7],
-        symbolSize: [8, 8]
-      },
-      axisTick: {
-        inside: true,
-        show: true
-      },
       name: 'Count',
-      type: 'value'
+      type: 'value',
+      ...ECHARTS_AXIS_ARROW_CONFIG
     }
   });
 
@@ -282,6 +269,73 @@ function Dashboard() {
     cnWordComplexity.values,
     'English Topic Complexity',
     '(len(title) + len(note))'
+  );
+
+  const getNewTextWrittenOption = (titleText: string, series: object[]) => ({
+    legend: {
+      orient: 'vertical',
+      x: 'right',
+      y: 'top'
+    },
+    series,
+    title: {
+      left: 'center',
+      text: titleText
+    },
+    tooltip: {
+      axisPointer: {
+        type: 'cross'
+      },
+      trigger: 'axis'
+    },
+    xAxis: {
+      data: newTextWritten.dates,
+      type: 'category',
+      ...ECHARTS_AXIS_ARROW_CONFIG
+    },
+    yAxis: {
+      name: 'Characters',
+      type: 'value',
+      ...ECHARTS_AXIS_ARROW_CONFIG
+    }
+  });
+
+  const wordNewTextWrittenOption = getNewTextWrittenOption(
+    'Statistics of Newly Written Text (Word)',
+    [
+      {
+        data: newTextWritten.wordNewWrittenTotals,
+        label: {
+          position: 'top',
+          show: true
+        },
+        name: 'Word',
+        type: 'line'
+      }
+    ]
+  );
+  const cnWordAndSentenceNewTextWrittenOption = getNewTextWrittenOption(
+    'Statistics of Newly Written Text (English Topic and Sentence)',
+    [
+      {
+        data: newTextWritten.cnWordNewWrittenTotals,
+        label: {
+          position: 'top',
+          show: true
+        },
+        name: 'English Topic',
+        type: 'line'
+      },
+      {
+        data: newTextWritten.sentenceNewWrittenTotals,
+        label: {
+          position: 'top',
+          show: true
+        },
+        name: 'Sentence',
+        type: 'line'
+      }
+    ]
   );
 
   return (
@@ -313,6 +367,10 @@ function Dashboard() {
       <div className={styles.charts}>
         <ReactEcharts className={styles.chart} option={sentenceComplexityOption} theme={mdEditorThemeName} />
         <ReactEcharts className={styles.chart} option={cnWordComplexityOption} theme={mdEditorThemeName} />
+      </div>
+      <div>
+        <ReactEcharts option={wordNewTextWrittenOption} theme={mdEditorThemeName} />
+        <ReactEcharts option={cnWordAndSentenceNewTextWrittenOption} theme={mdEditorThemeName} />
       </div>
     </div>
   );

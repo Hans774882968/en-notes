@@ -1,6 +1,8 @@
 import { GetSentenceParams, GetSentenceResp } from '@/lib/backend/paramAndResp';
+import { SentenceIdType } from '@/db/models/types';
 import { formLayout } from '@/lib/const';
 import Form from 'antd/lib/form';
+import LoadingInContainer from '../common/LoadingInContainer';
 import MarkdownPreviewer from '../MarkdownPreviewer';
 import Modal, { ModalProps } from 'antd/lib/modal';
 import RelevantWordsNode from './RelevantWordsNode';
@@ -8,7 +10,7 @@ import Request from '@/lib/frontend/request';
 import useSWR from 'swr';
 
 interface Props {
-  sentenceId: string
+  sentenceId: SentenceIdType
   sentence: string
   open: boolean
   onCancel: ModalProps['onCancel']
@@ -34,7 +36,7 @@ export default function SentenceInfoDialog({ sentenceId, sentence, open, onCance
       footer={[]}
     >
       {
-        !sentenceRecord ? <span>No data</span> : (
+        !sentenceRecord ? <LoadingInContainer /> : (
           <Form {...formLayout}>
             <RelevantWordsNode words={sentenceRecord.words} />
             <Form.Item label="Create Time">

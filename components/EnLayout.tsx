@@ -3,7 +3,7 @@ import { ThemeProvider } from './ThemeContext';
 import EnMenu from './EnMenu';
 import Head from 'next/head';
 import Layout from 'antd/lib/layout';
-import Navbar from './Navbar';
+import Navbar from './navbar/Navbar';
 import styles from './EnLayout.module.sass';
 
 interface Props {

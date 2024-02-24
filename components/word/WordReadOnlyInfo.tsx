@@ -3,6 +3,7 @@ import { WordInfoDialog } from './WordInfoDialog';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import Form from 'antd/lib/form';
+import NoSynonymsRecorded from './NoSynonymsRecorded';
 import SentencesItem from './SentencesItem';
 
 function SynonymsNode({ synonyms }: { synonyms: Word[] }) {
@@ -22,7 +23,7 @@ function SynonymsNode({ synonyms }: { synonyms: Word[] }) {
     synonyms.map(({ word }) => (
       <Button key={word} type="link" onClick={() => openDialog(word)}>{word}</Button>
     ))
-  ) : <span>No synonyms recorded yet</span>;
+  ) : <NoSynonymsRecorded />;
 
   return (
     <>

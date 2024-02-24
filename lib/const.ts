@@ -20,3 +20,16 @@ export const DEBOUNCE_DEFAULT_TIMEOUT = 500;
 export const DEBOUNCE_DEFAULT_OPTION = {
   trailing: true
 };
+
+export const ECHARTS_AXIS_ARROW_CONFIG = {
+  axisLine: {
+    show: true,
+    symbol: ['none', 'arrow'],
+    symbolOffset: [0, 7],
+    symbolSize: [8, 8]
+  },
+  axisTick: {
+    inside: true,
+    show: true
+  }
+};

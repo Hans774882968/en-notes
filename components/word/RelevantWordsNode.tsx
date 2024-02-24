@@ -3,6 +3,7 @@ import { WordInfoDialog } from './WordInfoDialog';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import Form from 'antd/lib/form';
+import NoWordsRecorded from './NoWordsRecorded';
 
 interface Props {
   words: Word[]
@@ -30,7 +31,7 @@ export default function RelevantWordsNode({ words }: Props) {
       />
       <Form.Item label="Relevant Words">
         {
-          !words.length ? <span>No words recorded yet</span> : (
+          !words.length ? <NoWordsRecorded /> : (
             words.map(({ word }) => (
               <Button key={word} type="link" onClick={() => openDialog(word)}>{word}</Button>
             ))

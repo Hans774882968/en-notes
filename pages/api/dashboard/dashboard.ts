@@ -2,9 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { Resp, suc } from '@/lib/resp';
 import { cnWord, sentence, word } from '@/db/models';
 import { createRouter } from 'next-connect';
-import { getCnWordComplexity } from '@/lib/backend/service/dashboard/getRecordComplexity';
 import {
+  getCnWordComplexity,
   getDashboardRecordResultItems,
+  getNewTextWrittenByDate,
   getSentenceComplexity,
   getSentenceCountOfWord,
   getSynonymCount,
@@ -36,8 +37,11 @@ router.get(async(req, res) => {
   const sentenceComplexity = await getSentenceComplexity();
   const cnWordComplexity = await getCnWordComplexity();
 
+  const newTextWritten = await getNewTextWrittenByDate();
+
   res.status(200).json(suc({
     cnWordComplexity,
+    newTextWritten,
     recordCount: {
       cnWord: {
         data: cnWordResultData,
