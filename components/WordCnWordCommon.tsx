@@ -2,6 +2,7 @@ import { CnWord, Word } from '@/db/models/types';
 import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayout } from '@/lib/const';
 import { DefaultOptionType } from 'antd/lib/select';
 import { ReactNode, useState } from 'react';
+import { StateMachine } from '@/lib/frontend/hooks/useCreateUpdateStateMachine';
 import { Store } from 'antd/lib/form/interface';
 import { ctrlSAction, preventAccidentSubmitAction } from '@/lib/frontend/keydownActions';
 import { useBeforeUnload } from 'react-use';
@@ -18,7 +19,6 @@ import QuestionCircleOutlined from '@ant-design/icons/QuestionCircleOutlined';
 import SearchToolTip from './SearchToolTip';
 import Tooltip from 'antd/lib/tooltip';
 import styles from './WordCnWordCommon.module.scss';
-import useCreateUpdateStateMachine from '@/lib/frontend/hooks/useCreateUpdateStateMachine';
 
 interface Props {
   afterGetWord: (word: Word | CnWord) => void
@@ -30,6 +30,7 @@ interface Props {
   noteFieldValue: string
   readOnlyInfo: ReactNode
   searchResultOptions: DefaultOptionType[]
+  stateMachine: StateMachine
   upsertRequest: (params: any) => Promise<boolean>
 }
 
@@ -70,6 +71,7 @@ export default function WordCnWordCommon({
   noteFieldValue,
   readOnlyInfo,
   searchResultOptions,
+  stateMachine,
   upsertRequest
 }: Props) {
   const {
@@ -82,7 +84,7 @@ export default function WordCnWordCommon({
     changeToFetchRecordState,
     stateText,
     isCreateOrUpdateState
-  } = useCreateUpdateStateMachine();
+  } = stateMachine;
 
   const [wordSearchKey, setWordSearchKey] = useState('');
 

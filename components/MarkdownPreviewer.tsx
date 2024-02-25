@@ -1,5 +1,6 @@
 import '@uiw/react-markdown-preview/markdown.css';
 import '@uiw/react-md-editor/markdown-editor.css';
+import { getLineCount } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import rehypeSanitize from 'rehype-sanitize';
 import styles from './md-editor-custom.module.scss';
@@ -14,16 +15,24 @@ interface Props {
 }
 
 export default function MarkdownPreviewer({ value }: Props) {
+  const lines = getLineCount(value);
+  const characters = value ? value.length : 0;
+
   return (
-    <MDEditor
-      className={styles.editor}
-      value={value}
-      preview="preview"
-      previewOptions={{
-        rehypePlugins: [[rehypeSanitize]]
-      }}
-      height={350}
-      spellCheck={true} // seems useless
-    />
+    <div>
+      <MDEditor
+        className={styles.editor}
+        value={value}
+        preview="preview"
+        previewOptions={{
+          rehypePlugins: [[rehypeSanitize]]
+        }}
+        height={500}
+      />
+      <div className={styles.statistics}>
+        <span>lines: {lines}</span>
+        <span>characters: {characters}</span>
+      </div>
+    </div>
   );
 }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Form from 'antd/lib/form';
 import Request from '@/lib/frontend/request';
 import WordCnWordCommon from '@/components/WordCnWordCommon';
+import useCreateUpdateStateMachine from '@/lib/frontend/hooks/useCreateUpdateStateMachine';
 
 type EditWordForm = {
   note: string
@@ -26,6 +27,13 @@ function CnWordReadOnlyInfo({ createTime, modifyTime }: {
 }
 
 export default function CnWordPage() {
+  const stateMachine = useCreateUpdateStateMachine();
+  const {
+    changeToSearchState,
+    changeToFetchingOptionsState,
+    changeToFetchedOptionsState
+  } = stateMachine;
+
   const [createTime, setCreateTime] = useState('');
   const [modifyTime, setModifyTime] = useState('');
 
@@ -41,12 +49,16 @@ export default function CnWordPage() {
   const handleWordSearch = async (newWord: string) => {
     if (!newWord) {
       setSearchResult([]);
+      changeToSearchState();
       return;
     }
+    changeToFetchingOptionsState();
     try {
       const { result } = await Request.get<CnWordSearchResp>({ params: { search: newWord }, url: '/api/cnWord/search' });
       setSearchResult(result);
+      changeToFetchedOptionsState();
     } catch (e) {
+      changeToSearchState();
       return;
     }
   };
@@ -91,6 +103,7 @@ export default function CnWordPage() {
         />
       }
       searchResultOptions={searchResultOptions}
+      stateMachine={stateMachine}
       upsertRequest={upsertRequest}
     />
   );

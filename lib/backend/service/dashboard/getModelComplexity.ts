@@ -64,3 +64,8 @@ export async function getSentenceComplexity() {
   const res = getRecordComplexity(complexityList, sentenceIntervals, sentenceIntervalIndex2Str);
   return res;
 }
+
+export const exportedForTesting = {
+  getIntervalIndex2Str,
+  getRecordComplexity
+};

@@ -6,6 +6,18 @@ SELECT `count` AS `name`, COUNT(*) AS `value` FROM (
   SELECT `word`.`word`, COUNT(*) AS `count` FROM word INNER JOIN (synonym AS `itsSynonyms->synonym` INNER JOIN word AS itsSynonyms ON `itsSynonyms`.`word` = `itsSynonyms->synonym`.`rhs`) ON `word`.`word` = `itsSynonyms->synonym`.`lhs` GROUP BY word
 ) AS tmp GROUP BY tmp.count
  */
+export function getCountingInfo(rawValueArray: number[], keyZeroCount: number) {
+  const mp = rawValueArray.reduce((mp, count) => {
+    const v = mp.get(count) || 0;
+    mp.set(count, v + 1);
+    return mp;
+  }, new Map<number, number>([[0, keyZeroCount]]));
+  const res = Array.from(mp.entries())
+    .sort(([k1], [k2]) => k1 - k2)
+    .map(([k, value]) => ({ name: String(k), value }));
+  return res;
+}
+
 export async function getSynonymCount() {
   const synonymRes = await word.count({
     attributes: [
@@ -17,14 +29,7 @@ export async function getSynonymCount() {
   });
   const wordTotal = await word.count();
   const noSynonymWordCount = wordTotal - synonymRes.length;
-  const mp = synonymRes.reduce((mp, { count }) => {
-    const v = mp.get(count) || 0;
-    mp.set(count, v + 1);
-    return mp;
-  }, new Map<number, number>([[0, noSynonymWordCount]]));
-  const res = Array.from(mp.entries())
-    .sort(([k1], [k2]) => k1 - k2)
-    .map(([k, value]) => ({ name: String(k), value }));
+  const res = getCountingInfo(synonymRes.map(({ count }) => count), noSynonymWordCount);
   return res;
 }
 
@@ -39,14 +44,7 @@ export async function getSentenceCountOfWord() {
   });
   const wordTotal = await word.count();
   const noSentenceWordCount = wordTotal - sentenceRes.length;
-  const mp = sentenceRes.reduce((mp, { count }) => {
-    const v = mp.get(count) || 0;
-    mp.set(count, v + 1);
-    return mp;
-  }, new Map<number, number>([[0, noSentenceWordCount]]));
-  const res = Array.from(mp.entries())
-    .sort(([k1], [k2]) => k1 - k2)
-    .map(([k, value]) => ({ name: String(k), value }));
+  const res = getCountingInfo(sentenceRes.map(({ count }) => count), noSentenceWordCount);
   return res;
 }
 
@@ -61,13 +59,6 @@ export async function getWordCountOfSentence() {
   });
   const sentenceTotal = await sentence.count();
   const noWordSentenceCount = sentenceTotal - wordRes.length;
-  const mp = wordRes.reduce((mp, { count }) => {
-    const v = mp.get(count) || 0;
-    mp.set(count, v + 1);
-    return mp;
-  }, new Map<number, number>([[0, noWordSentenceCount]]));
-  const res = Array.from(mp.entries())
-    .sort(([k1], [k2]) => k1 - k2)
-    .map(([k, value]) => ({ name: String(k), value }));
+  const res = getCountingInfo(wordRes.map(({ count }) => count), noWordSentenceCount);
   return res;
 }

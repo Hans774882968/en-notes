@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
 const SEARCH = 1;
 const CREATE = 2;
@@ -17,7 +17,26 @@ const stateToText: Record<State, string> = {
   [UPDATE]: 'Update'
 };
 
-export default function useCreateUpdateStateMachine() {
+export type StateMachine = {
+  changeToCreateState: () => void
+  changeToFetchRecordState: () => void
+  changeToFetchedOptionsState: () => void
+  changeToFetchingOptionsState: () => void
+  changeToSearchState: () => void
+  changeToUpdateState: () => void
+  currentState: State
+  isCreateOrUpdateState: boolean
+  isCreateState: boolean
+  isFetchRecordState: boolean
+  isFetchedOptionsState: boolean
+  isFetchingOptionsState: boolean
+  isSearchState: boolean
+  isUpdateState: boolean
+  setCurrentState: Dispatch<SetStateAction<State>>
+  stateText: string
+};
+
+export default function useCreateUpdateStateMachine(): StateMachine {
   const [currentState, setCurrentState] = useState<State>(SEARCH);
 
   const stateText = stateToText[currentState];

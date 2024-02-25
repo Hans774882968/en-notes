@@ -8,7 +8,7 @@ export enum OS {
   OTHER = 'Other'
 }
 
-// TODO：根据MDN，这种方式是不可靠的，但似乎没有其他办法……
+// TODO: 根据MDN，这种方式是不可靠的，但似乎没有其他办法……
 export function getPlatform (): OS {
   const ua = navigator.userAgent;
   if (ua.includes('Mac')) return OS.MAC;

@@ -2,6 +2,8 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
+    // 不知道为什么在 overrides 里设置 jest: true 无效，在此设置就有效
+    jest: true,
     node: true
   },
   extends: [

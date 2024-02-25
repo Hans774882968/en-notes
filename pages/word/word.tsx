@@ -5,19 +5,19 @@ import Form from 'antd/lib/form';
 import Request from '@/lib/frontend/request';
 import WordCnWordCommon from '@/components/WordCnWordCommon';
 import WordReadOnlyInfo from '@/components/word/WordReadOnlyInfo';
-// import useCreateUpdateStateMachine from '@/lib/frontend/hooks/useCreateUpdateStateMachine';
+import useCreateUpdateStateMachine from '@/lib/frontend/hooks/useCreateUpdateStateMachine';
 
 type EditWordForm = {
   note: string
 };
 
 export default function WordPage() {
-  // TODO: word 、 cnWord 页面 AutoComplete 增加 Loading
-  // const {
-  //   changeToSearchState,
-  //   changeToFetchingOptionsState,
-  //   changeToFetchedOptionsState
-  // } = useCreateUpdateStateMachine();
+  const stateMachine = useCreateUpdateStateMachine();
+  const {
+    changeToSearchState,
+    changeToFetchingOptionsState,
+    changeToFetchedOptionsState
+  } = stateMachine;
 
   const [synonyms, setSynonyms] = useState<Word[]>([]);
   const [sentences, setSentences] = useState<Sentence[]>([]);
@@ -37,16 +37,16 @@ export default function WordPage() {
   const handleWordSearch = async (newWord: string) => {
     if (!newWord) {
       setSearchResult([]);
-      // changeToSearchState();
+      changeToSearchState();
       return;
     }
-    // changeToFetchingOptionsState();
+    changeToFetchingOptionsState();
     try {
       const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
       setSearchResult(result);
-      // changeToFetchedOptionsState();
+      changeToFetchedOptionsState();
     } catch (e) {
-      // changeToSearchState();
+      changeToSearchState();
       return;
     }
   };
@@ -95,6 +95,7 @@ export default function WordPage() {
         />
       }
       searchResultOptions={searchResultOptions}
+      stateMachine={stateMachine}
       upsertRequest={upsertRequest}
     />
   );

@@ -35,8 +35,8 @@ function writeToTableWord({ tableContent, force }: writeTableParams) {
   tableContent.split(separator).forEach((recordStr) => {
     const idx = recordStr.indexOf('\n\n');
     if (idx === -1) return;
-    let wordKey = recordStr.substring(0, idx).trim();
-    let note = recordStr.substring(idx + 2).trim();
+    const wordKey = recordStr.substring(0, idx).trim();
+    const note = recordStr.substring(idx + 2).trim();
     if (force) {
       word.upsert({
         note,
@@ -63,8 +63,8 @@ function writeToTableCnWord({ tableContent, force }: writeTableParams) {
   tableContent.split(separator).forEach((recordStr) => {
     const idx = recordStr.indexOf('\n\n');
     if (idx === -1) return;
-    let wordKey = recordStr.substring(0, idx).trim();
-    let note = recordStr.substring(idx + 2).trim();
+    const wordKey = recordStr.substring(0, idx).trim();
+    const note = recordStr.substring(idx + 2).trim();
     if (force) {
       cnWord.upsert({
         note,
@@ -91,8 +91,8 @@ function writeToTableSentence({ tableContent, force }: writeTableParams) {
   tableContent.split(separator).forEach(async(recordStr) => {
     const idx = recordStr.indexOf('\n\n');
     if (idx === -1) return;
-    let sentenceStr = recordStr.substring(0, idx).trim();
-    let note = recordStr.substring(idx + 2).trim();
+    const sentenceStr = recordStr.substring(0, idx).trim();
+    const note = recordStr.substring(idx + 2).trim();
     const originalSentenceRecords = await sentence.findAll({
       where: {
         sentence: sentenceStr
@@ -128,8 +128,8 @@ function writeToTableWordSentence({ tableContent, force }: writeTableParams) {
   tableContent.split('\n').forEach(async(recordStr) => {
     const idx = recordStr.indexOf('|');
     if (idx === -1) return;
-    let sentenceId = recordStr.substring(0, idx).trim().toLowerCase();
-    let wordKey = recordStr.substring(idx + 1).trim();
+    const sentenceId = recordStr.substring(0, idx).trim().toLowerCase();
+    const wordKey = recordStr.substring(idx + 1).trim();
     const wordRecord = await word.findByPk(wordKey);
     if (!wordRecord) {
       return;
@@ -267,15 +267,15 @@ function importFromSeparateMds({ force, sentenceForce }: entryMethodParams) {
 function importFromMergedMd({ force, sentenceForce }: entryMethodParams) {
   const mergedMdPath = path.resolve(appDirectory, 'en_notes.md');
   const mdStr = fs.readFileSync(mergedMdPath, 'utf-8');
-  let tableStrs = mdStr.split('\n\n# ');
+  const tableStrs = mdStr.split('\n\n# ');
   if (!tableStrs.length || tableStrs[0].trim().toLowerCase() !== '[toc]') {
     throw new Error(`${mergedMdPath} content should start with "[toc]"`);
   }
   tableStrs.slice(1).forEach((tableStr) => {
     const idx = tableStr.indexOf('\n\n');
     if (idx === -1) return;
-    let tableDescriptor = tableStr.substring(0, idx).trim();
-    let tableContent = tableStr.substring(idx);
+    const tableDescriptor = tableStr.substring(0, idx).trim();
+    const tableContent = tableStr.substring(idx);
     if (tableDescriptor === 'words') writeToTableWord({ force, tableContent });
     else if (tableDescriptor === 'cnWords') writeToTableCnWord({ force, tableContent });
     else if (tableDescriptor === 'sentences') writeToTableSentence({ force: sentenceForce, tableContent });

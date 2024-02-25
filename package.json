@@ -10,7 +10,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --fix"
+    "lint": "next lint --fix",
+    "test": "jest"
   },
   "dependencies": {
     "@uiw/react-md-editor": "^3.25.6",
@@ -45,14 +46,25 @@
     "use-local-storage-state": "^19.1.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.23.9",
+    "@babel/preset-env": "^7.23.9",
+    "@babel/preset-typescript": "^7.23.3",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
+    "@types/jest": "^29.5.12",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "babel-jest": "^29.7.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
     "eslint-plugin-sort-imports-es6-autofix": "^0.6.0",
     "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5"
   }

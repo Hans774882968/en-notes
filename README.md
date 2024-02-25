@@ -1,8 +1,76 @@
-[toc]
+[TOC]
 
-## MarkdownEditor
+## 基础组件
 
-### 字数、行数统计
+### Jest
+
+根据[官方文档](https://nextjs.org/docs/app/building-your-application/testing/jest)，我们不得不走一遍比较麻烦的手动配置流程。整个流程走下来以后，如果不引入`lodash-es`等包就OK。但如果引用了，就会碰到这个问题：jest不支持`es`模块的`npm`包（如：`lodash-es`）。
+
+首先我按我去年做的[hans-reres 项目](https://github.com/Hans774882968/hans-reres/blob/main/README.md)走了一遍 jest 配置流程，发现问题并没有解决。值得注意的是，之前提到的babel配置文件是不必要的，且会造成next项目无法启动。`transform`配置暂时改成：
+
+```ts
+transform: {
+  '^.+\\.(ts|tsx)$': 'ts-jest',
+  '^.+\\.js$': 'ts-jest' // 不用 'babel-jest'
+}
+```
+
+然后我在急了一段时间后，决定Google一下，找到了[参考链接4](https://github.com/vercel/next.js/discussions/34589)，大意是 next 内部的代码导致`transformIgnorePatterns`加不上了，所以我们不得不在下面多写一段代码把这个配置加回来。
+
+```ts
+// 原本的代码是 export default createJestConfig(config); 需要改成下面这一坨
+
+const nextGetConfig = createJestConfig(config);
+
+const getConfig = async () => {
+  const nextJestConfig = await nextGetConfig();
+  const transformIgnorePatterns = [
+    '<rootDir>/node_modules/(?!lodash-es)',
+    ...(nextJestConfig.transformIgnorePatterns || []).filter(
+      (pattern) => pattern !== '/node_modules/'
+    )
+  ];
+  return {
+    ...nextJestConfig,
+    transformIgnorePatterns
+  };
+};
+
+export default getConfig;
+```
+
+重新运行，发现问题已经解决。但严格来说我这个 workaround 也可能埋坑。看[相关源码](https://github.com/vercel/next.js/blob/canary/packages/next/src/build/jest/jest.ts)
+
+```ts
+        transformIgnorePatterns: [
+          // To match Next.js behavior node_modules is not transformed, only `transpiledPackages`
+          ...(transpiled
+            ? [
+                `/node_modules/(?!.pnpm)(?!(${transpiled})/)`,
+                `/node_modules/.pnpm/(?!(${transpiled.replace(
+                  /\//g,
+                  '\\+'
+                )})@)`,
+              ]
+            : ['/node_modules/']),
+          // CSS modules are mocked so they don't need to be transformed
+          '^.+\\.module\\.(css|sass|scss)$',
+
+          // Custom config can append to transformIgnorePatterns but not modify it
+          // This is to ensure `node_modules` and .module.css/sass/scss are always excluded
+          ...(resolvedJestConfig.transformIgnorePatterns || []),
+        ],
+```
+
+幸好我目前用的`npm`，不用`pnpm`，暂时不用管。
+
+#### VSCode Jest插件
+
+去年这个插件不会在每次修改文件都自动跑测试的，今年发现新增了这个irritating的特性。根据[官方文档](https://github.com/jest-community/vscode-jest#runmode)，`Ctrl+Shift+P`打开`User Settings`，改下`"jest.runMode": "on-demand"`就行。
+
+### MarkdownEditor
+
+#### 字数、行数统计
 
 为了实现字数、行数统计，我们首先想到的是用`@uiw/react-md-editor`提供的`onStatistics`事件。这个事件就是专门用来实现字数统计功能的。资料很少，实测结果：
 
@@ -61,8 +129,9 @@ if (value !== lastValue) {
 }
 ```
 
-## 参考链接
+## 参考资料
 
 1. https://juejin.cn/post/7176075684823957561
 2. https://juejin.cn/post/6969572789581938718
 3. https://zh-hans.react.dev/learn/you-might-not-need-an-effect
+4. next里使用Jest如何解决“不支持`es`模块的`npm`包”：https://github.com/vercel/next.js/discussions/34589

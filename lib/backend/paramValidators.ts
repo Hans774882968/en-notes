@@ -1,9 +1,9 @@
-import { KeywordDefinition } from 'ajv';
+import { FuncKeywordDefinition } from 'ajv';
 import { SentenceIdType } from '@/db/models/types';
 import { enWordRegex } from '@/db/const';
 import { isLegalSentenceId } from '@/db/models/sentence';
 
-export const sentenceIdValidatorSchema: KeywordDefinition = {
+export const sentenceIdValidatorSchema: FuncKeywordDefinition = {
   keyword: 'sentenceIdLegal',
   type: 'string',
   validate: (schema: Record<string, any>, sentenceIdData: SentenceIdType) => {
@@ -11,7 +11,7 @@ export const sentenceIdValidatorSchema: KeywordDefinition = {
   }
 };
 
-export const enWordValidatorSchema: KeywordDefinition = {
+export const enWordValidatorSchema: FuncKeywordDefinition = {
   keyword: 'wordLegal',
   type: 'string',
   validate: (schema: Record<string, any>, wordData: string) => {

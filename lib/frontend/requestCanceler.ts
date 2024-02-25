@@ -16,7 +16,7 @@ export default class RequestCanceler {
   }
 
   static removePendingRequest(config: AxiosRequestConfig) {
-    const requestKey = config.url || '';
+    const requestKey = [config.url || '', config.method || ''].join(',');
     if (!this.pendingRequest.has(requestKey)) return;
     this.pendingRequest.get(requestKey)?.abort();
     this.pendingRequest.delete(requestKey);
