@@ -52,7 +52,7 @@ module.exports = {
     'object-curly-spacing': [
       2,
       'always',
-      { arraysInObjects: true, objectsInObjects: false }
+      { arraysInObjects: true, objectsInObjects: true }
     ],
 
     'prefer-const': 'error',

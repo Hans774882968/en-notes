@@ -1,6 +1,6 @@
 import { GetWordParams, GetWordResp } from '@/lib/backend/paramAndResp';
 import { Word } from '@/db/models/types';
-import { formLayout } from '@/lib/const';
+import { formLayout } from '@/lib/frontend/const';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import Form from 'antd/lib/form';
@@ -42,7 +42,7 @@ function useGetWord({ params, dialogOpen, externalData }: UseGetWordParams) {
   return { isLoading, ...data };
 }
 
-export function WordInfoDialog({ word, open, onCancel, externalData }: Props) {
+export default function WordInfoDialog({ word, open, onCancel, externalData }: Props) {
   const { word: wordRecord } = useGetWord({
     dialogOpen: open,
     externalData,
@@ -65,7 +65,7 @@ export function WordInfoDialog({ word, open, onCancel, externalData }: Props) {
     wordRecord?.itsSynonyms.map(({ word }) => (
       <Button key={word} type="link" onClick={() => openNextDialog(word)}>{word}</Button>
     ))
-  ) : <NoSynonymsRecorded />;
+  ) : <NoSynonymsRecorded belongWord={word} />;
 
   return (
     <>
@@ -91,7 +91,7 @@ export function WordInfoDialog({ word, open, onCancel, externalData }: Props) {
               <Form.Item label="Synonyms">
                 {synonymsNode}
               </Form.Item>
-              <SentencesItem sentences={wordRecord.sentences} />
+              <SentencesItem belongWord={word} sentences={wordRecord.sentences} />
               <Form.Item label="Create Time">
                 <span>{wordRecord.ctime}</span>
               </Form.Item>

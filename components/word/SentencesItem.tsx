@@ -5,7 +5,12 @@ import Form from 'antd/lib/form';
 import NoSentencesRecorded from './NoSentencesRecorded';
 import SentenceInfoDialog from './SentenceInfoDialog';
 
-export default function SentencesItem({ sentences }: { sentences: Sentence[] }) {
+interface Props {
+  sentences: Sentence[]
+  belongWord: string
+}
+
+export default function SentencesItem({ belongWord, sentences }: Props) {
   const [currentSentenceId, setCurrentSentenceId] = useState<SentenceIdType>('');
   const [currentSentence, setCurrentSentence] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,7 +35,7 @@ export default function SentencesItem({ sentences }: { sentences: Sentence[] }) 
       />
       <Form.Item label="Sentences">
         {
-          !sentences.length ? <NoSentencesRecorded /> : (
+          !sentences.length ? <NoSentencesRecorded belongWord={belongWord} /> : (
             <ol>
               {
                 sentences.map(({ id: sentenceId, sentence }) => {

@@ -1,7 +1,7 @@
 import { Dayjs } from 'dayjs';
 import { GetWordListParams, GetWordListResp } from '@/lib/backend/paramAndResp';
+import { WORD_COMPLEXITY_INTRO } from '@/lib/frontend/const';
 import { Word } from '@/db/models/types';
-import { WordInfoDialog } from '@/components/word/WordInfoDialog';
 import { removeFalsyAttrs } from '@/lib/utils';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
@@ -9,13 +9,32 @@ import DatePicker from 'antd/lib/date-picker';
 import EnLayout from '@/components/EnLayout';
 import EnNotesTable from '@/components/common/EnNotesTable';
 import Input from 'antd/lib/input';
+import QuestionCircleOutlined from '@ant-design/icons/QuestionCircleOutlined';
 import Request from '@/lib/frontend/request';
+import Tooltip from 'antd/lib/tooltip';
+import WordInfoDialog from '@/components/word/WordInfoDialog';
+import styles from './list.module.scss';
 
 const { RangePicker } = DatePicker;
 
 type BeforeGetWordListParams = Omit<GetWordListParams, 'ctime' | 'mtime'> & {
   ctime?: Dayjs[] | string[]
   mtime?: Dayjs[] | string[]
+}
+
+function ComplexityTooltip() {
+  return (
+    <>
+      Complexity
+      <Tooltip
+        placement="top"
+        title={WORD_COMPLEXITY_INTRO}
+        overlayStyle={{ maxWidth: 300 }}
+      >
+        <QuestionCircleOutlined className={styles.complexityTooltip} />
+      </Tooltip>
+    </>
+  );
 }
 
 export default function List() {
@@ -42,7 +61,7 @@ export default function List() {
     {
       dataIndex: 'complexity',
       key: 'complexity',
-      title: 'Complexity'
+      title: <ComplexityTooltip />
     },
     {
       dataIndex: 'synonymCount',

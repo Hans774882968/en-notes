@@ -1,12 +1,17 @@
 import { Sentence, Word } from '@/db/models/types';
-import { WordInfoDialog } from './WordInfoDialog';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import Form from 'antd/lib/form';
 import NoSynonymsRecorded from './NoSynonymsRecorded';
 import SentencesItem from './SentencesItem';
+import WordInfoDialog from './WordInfoDialog';
 
-function SynonymsNode({ synonyms }: { synonyms: Word[] }) {
+interface SynonymsNodeProps {
+  belongWord: string
+  synonyms: Word[]
+}
+
+function SynonymsNode({ belongWord, synonyms }: SynonymsNodeProps) {
   const [currentWord, setCurrentWord] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -23,7 +28,7 @@ function SynonymsNode({ synonyms }: { synonyms: Word[] }) {
     synonyms.map(({ word }) => (
       <Button key={word} type="link" onClick={() => openDialog(word)}>{word}</Button>
     ))
-  ) : <NoSynonymsRecorded />;
+  ) : <NoSynonymsRecorded belongWord={belongWord} />;
 
   return (
     <>
@@ -39,17 +44,25 @@ function SynonymsNode({ synonyms }: { synonyms: Word[] }) {
   );
 }
 
-export default function WordReadOnlyInfo({ createTime, modifyTime, sentences, synonyms }: {
+interface WordReadOnlyInfoProps {
+  belongWord: string
   createTime: string
   modifyTime: string
   sentences: Sentence[]
   synonyms: Word[]
-}) {
+}
 
+export default function WordReadOnlyInfo({
+  belongWord,
+  createTime,
+  modifyTime,
+  sentences,
+  synonyms
+}: WordReadOnlyInfoProps) {
   return (
     <>
-      <SynonymsNode synonyms={synonyms} />
-      <SentencesItem sentences={sentences} />
+      <SynonymsNode belongWord={belongWord} synonyms={synonyms} />
+      <SentencesItem belongWord={belongWord} sentences={sentences} />
       <Form.Item label="Create Time">
         <span>{createTime}</span>
       </Form.Item>

@@ -1,6 +1,6 @@
 import { GetSentenceParams, GetSentenceResp } from '@/lib/backend/paramAndResp';
 import { SentenceIdType } from '@/db/models/types';
-import { formLayout } from '@/lib/const';
+import { formLayout } from '@/lib/frontend/const';
 import Form from 'antd/lib/form';
 import LoadingInContainer from '../common/LoadingInContainer';
 import MarkdownPreviewer from '../MarkdownPreviewer';
@@ -38,7 +38,7 @@ export default function SentenceInfoDialog({ sentenceId, sentence, open, onCance
       {
         !sentenceRecord ? <LoadingInContainer /> : (
           <Form {...formLayout}>
-            <RelevantWordsNode words={sentenceRecord.words} />
+            <RelevantWordsNode belongSentence={{ id: sentenceId, text: sentence }} words={sentenceRecord.words} />
             <Form.Item label="Create Time">
               <span>{sentenceRecord.ctime}</span>
             </Form.Item>

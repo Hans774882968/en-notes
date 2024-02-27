@@ -29,14 +29,13 @@ function CnWordReadOnlyInfo({ createTime, modifyTime }: {
 export default function CnWordPage() {
   const stateMachine = useCreateUpdateStateMachine();
   const {
-    changeToSearchState,
-    changeToFetchingOptionsState,
-    changeToFetchedOptionsState
+    changeToSearchState
   } = stateMachine;
 
   const [createTime, setCreateTime] = useState('');
   const [modifyTime, setModifyTime] = useState('');
 
+  const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [searchResult, setSearchResult] = useState<CnWord[]>([]);
   const searchResultOptions = searchResult.map((wd) => ({ label: wd.word, value: wd.word }));
 
@@ -52,14 +51,14 @@ export default function CnWordPage() {
       changeToSearchState();
       return;
     }
-    changeToFetchingOptionsState();
+    setIsFetchingOptions(true);
     try {
       const { result } = await Request.get<CnWordSearchResp>({ params: { search: newWord }, url: '/api/cnWord/search' });
       setSearchResult(result);
-      changeToFetchedOptionsState();
     } catch (e) {
-      changeToSearchState();
       return;
+    } finally {
+      setIsFetchingOptions(false);
     }
   };
 
@@ -95,6 +94,7 @@ export default function CnWordPage() {
       getWordReq={getWordReq}
       handleWordSearch={handleWordSearch}
       initialValue={initialValue}
+      isFetchingOptions={isFetchingOptions}
       noteFieldValue={noteFieldValue}
       readOnlyInfo={
         <CnWordReadOnlyInfo

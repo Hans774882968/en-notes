@@ -1,5 +1,5 @@
 import { CnWord, Word } from '@/db/models/types';
-import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayout } from '@/lib/const';
+import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayout } from '@/lib/frontend/const';
 import { DefaultOptionType } from 'antd/lib/select';
 import { ReactNode, useState } from 'react';
 import { StateMachine } from '@/lib/frontend/hooks/useCreateUpdateStateMachine';
@@ -27,6 +27,7 @@ interface Props {
   getWordReq: (wordSearchKey: string) => Promise<Word | CnWord | null>
   handleWordSearch: (newWord: string) => void
   initialValue: Store
+  isFetchingOptions: boolean
   noteFieldValue: string
   readOnlyInfo: ReactNode
   searchResultOptions: DefaultOptionType[]
@@ -68,6 +69,7 @@ export default function WordCnWordCommon({
   getWordReq,
   handleWordSearch,
   initialValue,
+  isFetchingOptions,
   noteFieldValue,
   readOnlyInfo,
   searchResultOptions,
@@ -75,14 +77,13 @@ export default function WordCnWordCommon({
   upsertRequest
 }: Props) {
   const {
-    isFetchingOptionsState,
     isUpdateState,
     isFetchRecordState,
     changeToCreateState,
     changeToSearchState,
     changeToUpdateState,
     changeToFetchRecordState,
-    stateText,
+    getStateText,
     isCreateOrUpdateState
   } = stateMachine;
 
@@ -95,8 +96,8 @@ export default function WordCnWordCommon({
   useBeforeUnload(isNoteChanged, 'Changes you have made to the Note field may not be saved');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const shouldShowNoteField = isCreateOrUpdateState;
-  const canNotSubmit = !isCreateOrUpdateState || !noteFieldValue || !isNoteChanged || isSubmitting;
+  const shouldShowNoteField = isCreateOrUpdateState();
+  const canNotSubmit = !isCreateOrUpdateState() || !noteFieldValue || !isNoteChanged || isSubmitting;
 
   const rules = {
     note: [
@@ -190,7 +191,7 @@ export default function WordCnWordCommon({
           onFinish={onFinish}
           autoComplete="off"
         >
-          <ModeField stateText={stateText} />
+          <ModeField stateText={getStateText()} />
 
           <Form.Item label={<SearchToolTip />}>
             <AutoComplete
@@ -201,13 +202,13 @@ export default function WordCnWordCommon({
               onSearch={debounceHandleWordSearch}
               onBlur={getWord}
               onInputKeyDown={(e) => preventAccidentSubmit(e)}
-              notFoundContent={isFetchingOptionsState ? <LoadingInContainer /> : null}
+              notFoundContent={isFetchingOptions ? <LoadingInContainer /> : null}
             />
           </Form.Item>
 
-          {isFetchRecordState && <EditPageSkeleton fieldCountBeforeNoteField={4} />}
+          {isFetchRecordState() && <EditPageSkeleton fieldCountBeforeNoteField={4} />}
 
-          {isUpdateState && readOnlyInfo}
+          {isUpdateState() && readOnlyInfo}
 
           {
             shouldShowNoteField && (

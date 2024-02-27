@@ -1,6 +1,7 @@
 import { CreateSentenceResp } from '@/lib/backend/paramAndResp';
-import { btnLayout, formLayout } from '@/lib/const';
+import { btnLayout, formLayout } from '@/lib/frontend/const';
 import { ctrlSAction } from '@/lib/frontend/keydownActions';
+import { useBeforeUnload } from 'react-use';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import EnLayout from '@/components/EnLayout';
@@ -16,6 +17,7 @@ type CreateSentenceForm = {
   note: string
 };
 
+// TODO: 提交后，如果在没更改的情况下按 ctrl + S 那么表单能够通过校验，不会报错，和 edit 页略有不同。懒得复制 edit 页的代码改这个 rules 了，就先这样吧
 const rules = {
   note: [{ message: 'note should not be empty', required: true }],
   sentence: [{ message: 'sentence should not be empty', required: true }]
@@ -30,10 +32,18 @@ export default function Create() {
     sentence: ''
   };
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const canNotSubmit = !sentenceFieldValue || !noteFieldValue || isSubmitting;
+  const [lastSubmittedSentence, setLastSubmittedSentence] = useState('');
+  const [lastSubmittedNote, setLastSubmittedNote] = useState('');
 
-  const mdEditorKeyDown = ctrlSAction(() => createSentenceForm.submit());
+  const isSentenceChanged = sentenceFieldValue !== lastSubmittedSentence;
+  const isNoteChanged = noteFieldValue !== lastSubmittedNote;
+  const isContentChanged = isSentenceChanged || isNoteChanged;
+  useBeforeUnload(isContentChanged, 'Changes you have made may not be saved');
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const canNotSubmit = !sentenceFieldValue || !noteFieldValue || !isContentChanged || isSubmitting;
+
+  const editorKeyDown = ctrlSAction(() => createSentenceForm.submit());
 
   const onFinish = async (createSentenceFormData: CreateSentenceForm) => {
     if (canNotSubmit) return;
@@ -44,6 +54,8 @@ export default function Create() {
         data: createSentenceFormData,
         url: '/api/createSentence'
       });
+      setLastSubmittedSentence(sentenceFieldValue);
+      setLastSubmittedNote(noteFieldValue);
       Message.success('Create sentence success');
     } catch (e) {
       return;
@@ -69,10 +81,13 @@ export default function Create() {
           autoComplete="off"
         >
           <Form.Item label="Sentence" name="sentence" rules={rules.sentence}>
-            <Input autoFocus />
+            <Input autoFocus onKeyDown={editorKeyDown} />
           </Form.Item>
           <Form.Item label="Note" name="note" rules={rules.note}>
-            <MarkdownEditor onKeyDown={mdEditorKeyDown} />
+            <MarkdownEditor
+              onKeyDown={editorKeyDown}
+              highlightBorder={isNoteChanged}
+            />
           </Form.Item>
           <Form.Item {...btnLayout}>
             <Button

@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
+import { sentenceTextRegex, timestampOptions } from '../const';
 import { sequelizeObject } from '../sequelizeObject';
-import { timestampOptions } from '../const';
 import FlakeId from 'flake-idgen';
 import intformat from 'biguint-format';
 
@@ -29,7 +29,10 @@ export const sentence = sequelizeObject.define(
     },
     sentence: {
       allowNull: false,
-      type: DataTypes.STRING(500)
+      type: DataTypes.STRING(500),
+      validate: {
+        is: sentenceTextRegex
+      }
     }
   },
   {

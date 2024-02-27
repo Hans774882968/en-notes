@@ -1,6 +1,7 @@
-import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayout } from '@/lib/const';
+import { BelongSentence } from '@/lib/frontend/encDecSentenceInfo';
+import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayout } from '@/lib/frontend/const';
 import { GetSentenceResp, SentenceSearchResp, UpdateSentenceResp } from '@/lib/backend/paramAndResp';
-import { Sentence, Word } from '@/db/models/types';
+import { Sentence, SentenceIdType, Word } from '@/db/models/types';
 import { ctrlSAction } from '@/lib/frontend/keydownActions';
 import { useBeforeUnload } from 'react-use';
 import { useDebouncedCallback } from 'use-debounce';
@@ -17,7 +18,6 @@ import RelevantWordsNode from '@/components/word/RelevantWordsNode';
 import Request from '@/lib/frontend/request';
 import SearchToolTip from '@/components/SearchToolTip';
 import Select from 'antd/lib/select';
-import Spin from 'antd/lib/spin';
 import styles from './edit.module.scss';
 import useCreateUpdateStateMachine from '@/lib/frontend/hooks/useCreateUpdateStateMachine';
 
@@ -26,14 +26,20 @@ type EditSentenceForm = {
   note: string
 };
 
-function SentenceReadOnlyInfo({ createTime, modifyTime, words }: {
+interface SentenceReadOnlyInfoProps {
   createTime: string
   modifyTime: string
   words: Word[]
-}) {
+  belongSentence: {
+    id: SentenceIdType
+    text: string
+  }
+}
+
+function SentenceReadOnlyInfo({ createTime, modifyTime, words, belongSentence }: SentenceReadOnlyInfoProps) {
   return (
     <>
-      <RelevantWordsNode words={words} />
+      <RelevantWordsNode belongSentence={belongSentence} words={words} />
       <Form.Item label="Create Time">
         <span>{createTime}</span>
       </Form.Item>
@@ -50,10 +56,7 @@ export default function Edit() {
     isFetchRecordState,
     changeToSearchState,
     changeToUpdateState,
-    changeToFetchRecordState,
-    changeToFetchingOptionsState,
-    changeToFetchedOptionsState,
-    isFetchingOptionsState
+    changeToFetchRecordState
   } = useCreateUpdateStateMachine();
 
   const [editSentenceForm] = Form.useForm<EditSentenceForm>();
@@ -67,8 +70,11 @@ export default function Edit() {
   const [relevantWords, setRelevantWords] = useState<Word[]>([]);
   const [createTime, setCreateTime] = useState('');
   const [modifyTime, setModifyTime] = useState('');
+  const [belongSentence, setBelongSentence] = useState<BelongSentence>({ id: '', text: '' });
 
   const [sentenceId, setSentenceId] = useState('');
+
+  const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [searchResult, setSearchResult] = useState<Sentence[]>([]);
   const searchResultOptions = searchResult.map((st) => ({ label: st.sentence, value: st.id }));
 
@@ -79,10 +85,10 @@ export default function Edit() {
   const isSentenceChanged = sentenceFieldValue !== originalSentence;
   const isNoteChanged = noteFieldValue !== originalNote;
   const isContentChanged = isSentenceChanged || isNoteChanged;
-  useBeforeUnload(isContentChanged, 'Changes you have made to the Note field may not be saved');
+  useBeforeUnload(isContentChanged, 'Changes you have made may not be saved');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const canNotSubmit = !isUpdateState || !sentenceFieldValue || !noteFieldValue || !isContentChanged || isSubmitting;
+  const canNotSubmit = !isUpdateState() || !sentenceFieldValue || !noteFieldValue || !isContentChanged || isSubmitting;
 
   const rules = {
     note: [
@@ -112,14 +118,14 @@ export default function Edit() {
         changeToSearchState();
         return;
       }
-      changeToFetchingOptionsState();
+      setIsFetchingOptions(true);
       try {
         const { result } = await Request.get<SentenceSearchResp>({ params: { search: newSentence }, url: '/api/sentence/search' });
         setSearchResult(result);
-        changeToFetchedOptionsState();
       } catch (e) {
-        changeToSearchState();
         return;
+      } finally {
+        setIsFetchingOptions(false);
       }
     },
     DEBOUNCE_DEFAULT_TIMEOUT,
@@ -152,6 +158,7 @@ export default function Edit() {
     setRelevantWords(sentence.words);
     setCreateTime(sentence.ctime);
     setModifyTime(sentence.mtime);
+    setBelongSentence({ id: sentence.id, text: sentence.sentence });
     editSentenceForm.setFieldValue('sentence', sentence.sentence);
     editSentenceForm.setFieldValue('note', sentence.note);
     setOriginalSentence(sentence.sentence);
@@ -221,14 +228,15 @@ export default function Edit() {
               onBlur={getSentence}
               showSearch
               filterOption={false}
-              notFoundContent={isFetchingOptionsState ? <LoadingInContainer /> : null}
+              notFoundContent={isFetchingOptions ? <LoadingInContainer /> : null}
             />
           </Form.Item>
-          {isFetchRecordState && <EditPageSkeleton fieldCountBeforeNoteField={4} />}
+          {isFetchRecordState() && <EditPageSkeleton fieldCountBeforeNoteField={4} />}
           {
-            isUpdateState && (
+            isUpdateState() && (
               <>
                 <SentenceReadOnlyInfo
+                  belongSentence={belongSentence}
                   createTime={createTime}
                   modifyTime={modifyTime}
                   words={relevantWords}
@@ -258,7 +266,7 @@ export default function Edit() {
               Submit
             </Button>
             {
-              isUpdateState && (
+              isUpdateState() && (
                 <Button className={styles.btn} onClick={cleanNote}>
                   Clean Note
                 </Button>

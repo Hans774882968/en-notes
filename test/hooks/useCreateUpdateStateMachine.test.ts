@@ -4,39 +4,48 @@ import useCreateUpdateStateMachine from '@/lib/frontend/hooks/useCreateUpdateSta
 describe('useCreateUpdateStateMachine', () => {
   it('basic', () => {
     const { result } = renderHook(() => useCreateUpdateStateMachine());
-    expect(result.current.isSearchState).toBeTruthy();
-    expect(result.current.stateText).toBe('Search');
+    expect(result.current.isSearchState()).toBeTruthy();
+    expect(result.current.getStateText()).toBe('Search');
     act(() => {
       result.current.changeToCreateState();
     });
-    expect(result.current.isCreateState).toBeTruthy();
-    expect(result.current.isCreateOrUpdateState).toBeTruthy();
-    expect(result.current.stateText).toBe('Create');
+    expect(result.current.isCreateState()).toBeTruthy();
+    expect(result.current.isCreateOrUpdateState()).toBeTruthy();
+    expect(result.current.getStateText()).toBe('Create');
     act(() => {
       result.current.changeToFetchRecordState();
     });
-    expect(result.current.isFetchRecordState).toBeTruthy();
-    expect(result.current.stateText).toBe('Fetching Record');
-    act(() => {
-      result.current.changeToFetchedOptionsState();
-    });
-    expect(result.current.isFetchedOptionsState).toBeTruthy();
-    expect(result.current.stateText).toBe('Fetched Options');
-    act(() => {
-      result.current.changeToFetchingOptionsState();
-    });
-    expect(result.current.isFetchingOptionsState).toBeTruthy();
-    expect(result.current.stateText).toBe('Fetching Options');
+    expect(result.current.isFetchRecordState()).toBeTruthy();
+    expect(result.current.getStateText()).toBe('Fetching Record');
     act(() => {
       result.current.changeToSearchState();
     });
-    expect(result.current.isSearchState).toBeTruthy();
-    expect(result.current.stateText).toBe('Search');
+    expect(result.current.isSearchState()).toBeTruthy();
+    expect(result.current.getStateText()).toBe('Search');
     act(() => {
       result.current.changeToUpdateState();
     });
-    expect(result.current.isUpdateState).toBeTruthy();
-    expect(result.current.isCreateOrUpdateState).toBeTruthy();
-    expect(result.current.stateText).toBe('Update');
+    expect(result.current.isUpdateState()).toBeTruthy();
+    expect(result.current.isCreateOrUpdateState()).toBeTruthy();
+    expect(result.current.getStateText()).toBe('Update');
+  });
+
+  it('Multiple changes', () => {
+    const { result } = renderHook(() => useCreateUpdateStateMachine());
+    expect(result.current.isSearchState()).toBeTruthy();
+    act(() => {
+      result.current.changeToCreateState();
+      expect(result.current.isCreateState()).toBeTruthy();
+      expect(result.current.isCreateOrUpdateState()).toBeTruthy();
+
+      result.current.changeToFetchRecordState();
+      expect(result.current.isFetchRecordState()).toBeTruthy();
+      expect(result.current.getStateText()).toBe('Fetching Record');
+
+      result.current.changeToUpdateState();
+    });
+    expect(result.current.isUpdateState()).toBeTruthy();
+    expect(result.current.isCreateOrUpdateState()).toBeTruthy();
+    expect(result.current.getStateText()).toBe('Update');
   });
 });

@@ -1,15 +1,17 @@
+import { BelongSentence } from '@/lib/frontend/encDecSentenceInfo';
 import { Word } from '@/db/models/types';
-import { WordInfoDialog } from './WordInfoDialog';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import Form from 'antd/lib/form';
 import NoWordsRecorded from './NoWordsRecorded';
+import WordInfoDialog from './WordInfoDialog';
 
 interface Props {
   words: Word[]
+  belongSentence: BelongSentence
 }
 
-export default function RelevantWordsNode({ words }: Props) {
+export default function RelevantWordsNode({ words, belongSentence }: Props) {
   const [currentWord, setCurrentWord] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -31,7 +33,7 @@ export default function RelevantWordsNode({ words }: Props) {
       />
       <Form.Item label="Relevant Words">
         {
-          !words.length ? <NoWordsRecorded /> : (
+          !words.length ? <NoWordsRecorded belongSentence={belongSentence} /> : (
             words.map(({ word }) => (
               <Button key={word} type="link" onClick={() => openDialog(word)}>{word}</Button>
             ))

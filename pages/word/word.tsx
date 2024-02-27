@@ -14,16 +14,16 @@ type EditWordForm = {
 export default function WordPage() {
   const stateMachine = useCreateUpdateStateMachine();
   const {
-    changeToSearchState,
-    changeToFetchingOptionsState,
-    changeToFetchedOptionsState
+    changeToSearchState
   } = stateMachine;
 
+  const [belongWord, setBelongWord] = useState('');
   const [synonyms, setSynonyms] = useState<Word[]>([]);
   const [sentences, setSentences] = useState<Sentence[]>([]);
   const [createTime, setCreateTime] = useState('');
   const [modifyTime, setModifyTime] = useState('');
 
+  const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [searchResult, setSearchResult] = useState<Word[]>([]);
   const searchResultOptions = searchResult.map((wd) => ({ label: wd.word, value: wd.word }));
 
@@ -40,14 +40,14 @@ export default function WordPage() {
       changeToSearchState();
       return;
     }
-    changeToFetchingOptionsState();
+    setIsFetchingOptions(true);
     try {
       const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
       setSearchResult(result);
-      changeToFetchedOptionsState();
     } catch (e) {
-      changeToSearchState();
       return;
+    } finally {
+      setIsFetchingOptions(false);
     }
   };
 
@@ -56,12 +56,14 @@ export default function WordPage() {
     setModifyTime(word.mtime);
     setSynonyms(word.itsSynonyms);
     setSentences(word.sentences);
+    setBelongWord(word.word);
   };
 
   const clearFieldsExceptWordKey = () => {
     setCreateTime('');
     setModifyTime('');
     editWordForm.setFieldValue('note', '');
+    setBelongWord('');
   };
 
   const getWordReq = async (wordSearchKey: string) => {
@@ -85,9 +87,11 @@ export default function WordPage() {
       getWordReq={getWordReq}
       handleWordSearch={handleWordSearch}
       initialValue={initialValue}
+      isFetchingOptions={isFetchingOptions}
       noteFieldValue={noteFieldValue}
       readOnlyInfo={
         <WordReadOnlyInfo
+          belongWord={belongWord}
           createTime={createTime}
           modifyTime={modifyTime}
           sentences={sentences}

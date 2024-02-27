@@ -129,6 +129,26 @@ if (value !== lastValue) {
 }
 ```
 
+## 具体页面
+
+### 单词、English Topic创建、编辑二合一页
+
+这个页面希望创建、编辑二合一，所以我设计了一个状态机。目前拥有的状态：Search、Fetch Record、Create、Update。进入页面时为Search状态；输入关键词后搜索单词；输入框失去焦点后，获取记录前变为Fetch Record状态；请求返回后，若数据库有记录则变为Update状态，否则为Create状态；提交后要立刻再次拉取记录，如果原先是Create状态则变为Update状态，否则状态不变。为什么这里没有提及“获取下拉框选项”相关的状态？因为获取下拉框选项和失去焦点后获取记录这两件事的发生顺序不一定是前者先于后者，可能是：发起获取下拉框选项的请求→发起获取记录的请求→获取记录的请求返回→获取下拉框选项的请求返回，等等顺序。这就存在一个竞态条件。为了规避这个问题，我们就不引入这两个状态，而是单独用`isFetchingOptions`变量控制。
+
+状态机的实现可以单独抽出一个自定义hook。因为react存在这么一个问题：
+
+```tsx
+function onClick() {
+  console.log(count); // value is x
+  setCount(count + 1);
+  console.log(count); // still x
+  setCount(count + 1);
+  console.log(count); // still x
+}
+```
+
+并不能做到加两次，所以我们使用了`react-use`的`useGetSet`（`ahooks`也提供了类似的hook）。[实现代码传送门](https://github.com/Hans774882968/en-notes/blob/main/lib/frontend/hooks/useCreateUpdateStateMachine.ts)
+
 ## 参考资料
 
 1. https://juejin.cn/post/7176075684823957561

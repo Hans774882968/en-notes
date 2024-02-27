@@ -1,17 +1,14 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch } from 'react';
+import { IHookStateSetAction } from 'react-use/lib/misc/hookState';
+import { useGetSet } from 'react-use';
 
 const SEARCH = 1;
 const CREATE = 2;
 const UPDATE = 3;
 const FETCH_RECORD = 4;
-const FETCHING_OPTIONS = 5;
-const FETCHED_OPTIONS = 6;
-type State = typeof SEARCH | typeof CREATE | typeof UPDATE | typeof FETCH_RECORD
-  | typeof FETCHING_OPTIONS | typeof FETCHED_OPTIONS;
+type State = typeof SEARCH | typeof CREATE | typeof UPDATE | typeof FETCH_RECORD;
 const stateToText: Record<State, string> = {
   [CREATE]: 'Create',
-  [FETCHED_OPTIONS]: 'Fetched Options',
-  [FETCHING_OPTIONS]: 'Fetching Options',
   [FETCH_RECORD]: 'Fetching Record',
   [SEARCH]: 'Search',
   [UPDATE]: 'Update'
@@ -20,34 +17,28 @@ const stateToText: Record<State, string> = {
 export type StateMachine = {
   changeToCreateState: () => void
   changeToFetchRecordState: () => void
-  changeToFetchedOptionsState: () => void
-  changeToFetchingOptionsState: () => void
   changeToSearchState: () => void
   changeToUpdateState: () => void
-  currentState: State
-  isCreateOrUpdateState: boolean
-  isCreateState: boolean
-  isFetchRecordState: boolean
-  isFetchedOptionsState: boolean
-  isFetchingOptionsState: boolean
-  isSearchState: boolean
-  isUpdateState: boolean
-  setCurrentState: Dispatch<SetStateAction<State>>
-  stateText: string
+  getCurrentState: () => State
+  setCurrentState: Dispatch<IHookStateSetAction<State>>
+  isCreateOrUpdateState: () => boolean
+  isCreateState: () => boolean
+  isFetchRecordState: () => boolean
+  isSearchState: () => boolean
+  isUpdateState: () => boolean
+  getStateText: () => string
 };
 
 export default function useCreateUpdateStateMachine(): StateMachine {
-  const [currentState, setCurrentState] = useState<State>(SEARCH);
+  const [getCurrentState, setCurrentState] = useGetSet<State>(SEARCH);
 
-  const stateText = stateToText[currentState];
+  const getStateText = () => stateToText[getCurrentState()];
 
-  const isSearchState = currentState === SEARCH;
-  const isCreateState = currentState === CREATE;
-  const isUpdateState = currentState === UPDATE;
-  const isFetchRecordState = currentState === FETCH_RECORD;
-  const isFetchingOptionsState = currentState === FETCHING_OPTIONS;
-  const isFetchedOptionsState = currentState === FETCHED_OPTIONS;
-  const isCreateOrUpdateState = isCreateState || isUpdateState;
+  const isSearchState = () => getCurrentState() === SEARCH;
+  const isCreateState = () => getCurrentState() === CREATE;
+  const isUpdateState = () => getCurrentState() === UPDATE;
+  const isFetchRecordState = () => getCurrentState() === FETCH_RECORD;
+  const isCreateOrUpdateState = () => isCreateState() || isUpdateState();
 
   function changeToSearchState() {
     setCurrentState(SEARCH);
@@ -65,30 +56,18 @@ export default function useCreateUpdateStateMachine(): StateMachine {
     setCurrentState(FETCH_RECORD);
   }
 
-  function changeToFetchingOptionsState() {
-    setCurrentState(FETCHING_OPTIONS);
-  }
-
-  function changeToFetchedOptionsState() {
-    setCurrentState(FETCHED_OPTIONS);
-  }
-
   return {
     changeToCreateState,
     changeToFetchRecordState,
-    changeToFetchedOptionsState,
-    changeToFetchingOptionsState,
     changeToSearchState,
     changeToUpdateState,
-    currentState,
+    getCurrentState,
+    getStateText,
     isCreateOrUpdateState,
     isCreateState,
     isFetchRecordState,
-    isFetchedOptionsState,
-    isFetchingOptionsState,
     isSearchState,
     isUpdateState,
-    setCurrentState,
-    stateText
+    setCurrentState
   };
 }

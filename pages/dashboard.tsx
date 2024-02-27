@@ -1,5 +1,10 @@
+import {
+  CN_WORD_COMPLEXITY_INTRO,
+  ECHARTS_AXIS_ARROW_CONFIG,
+  SENTENCE_COMPLEXITY_INTRO,
+  WORD_COMPLEXITY_INTRO
+} from '@/lib/frontend/const';
 import { DashboardResp, PieChartItem } from '@/lib/backend/paramAndResp';
-import { ECHARTS_AXIS_ARROW_CONFIG } from '@/lib/const';
 import { useThemeContext } from '@/components/ThemeContext';
 import Card from 'antd/lib/card';
 import Col from 'antd/lib/col';
@@ -256,19 +261,19 @@ function Dashboard() {
     wordComplexity.ranges,
     wordComplexity.values,
     'Word Complexity',
-    '(len(note) + sum(len(sentences[i].sentence)))'
+    `(${WORD_COMPLEXITY_INTRO})`
   );
   const sentenceComplexityOption = getComplexityOption(
     sentenceComplexity.ranges,
     sentenceComplexity.values,
     'Sentence Complexity',
-    '(len(sentence) + len(note))'
+    `(${SENTENCE_COMPLEXITY_INTRO})`
   );
   const cnWordComplexityOption = getComplexityOption(
     cnWordComplexity.ranges,
     cnWordComplexity.values,
     'English Topic Complexity',
-    '(len(title) + len(note))'
+    `(${CN_WORD_COMPLEXITY_INTRO})`
   );
 
   const getNewTextWrittenOption = (titleText: string, series: object[]) => ({

@@ -6,30 +6,3 @@ export const CN_WORDS_MD = 'cnWords.md';
 export const SENTENCES_MD = 'sentences.md';
 export const WORD_SENTENCES_MD = 'wordSentences.md';
 export const SYNONYMS_MD = 'synonyms.md';
-
-export const formLayout = {
-  labelCol: { span: 3 },
-  wrapperCol: { span: 19 }
-};
-
-export const btnLayout = {
-  wrapperCol: { offset: 3, span: 19 }
-};
-
-export const DEBOUNCE_DEFAULT_TIMEOUT = 500;
-export const DEBOUNCE_DEFAULT_OPTION = {
-  trailing: true
-};
-
-export const ECHARTS_AXIS_ARROW_CONFIG = {
-  axisLine: {
-    show: true,
-    symbol: ['none', 'arrow'],
-    symbolOffset: [0, 7],
-    symbolSize: [8, 8]
-  },
-  axisTick: {
-    inside: true,
-    show: true
-  }
-};
