@@ -11,7 +11,7 @@ type ContextType = {
 
 const ThemeContext = createContext<ContextType>(null);
 
-enum MdEditorThemeName {
+export enum MdEditorThemeName {
   DARK = 'dark',
   DEFAULT = 'light'
 }
@@ -51,5 +51,9 @@ export const ThemeProvider: React.FC<Props> = (props) => {
 };
 
 export const useThemeContext = () => {
-  return useContext(ThemeContext);
+  const ctx = useContext(ThemeContext);
+  if (ctx === null) {
+    throw new Error('useThemeContext should be used in ThemeProvider');
+  }
+  return ctx;
 };

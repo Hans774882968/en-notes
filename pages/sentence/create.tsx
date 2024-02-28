@@ -10,6 +10,7 @@ import Input from 'antd/lib/input';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import Message from 'antd/lib/message';
 import Request from '@/lib/frontend/request';
+import Spin from 'antd/lib/spin';
 import styles from './create.module.scss';
 
 type CreateSentenceForm = {
@@ -72,38 +73,40 @@ export default function Create() {
   return (
     <EnLayout>
       <div className={styles.sentence}>
-        <Form
-          {...formLayout}
-          form={createSentenceForm}
-          name="createSentenceForm"
-          initialValues={initialValue}
-          onFinish={onFinish}
-          autoComplete="off"
-        >
-          <Form.Item label="Sentence" name="sentence" rules={rules.sentence}>
-            <Input autoFocus onKeyDown={editorKeyDown} />
-          </Form.Item>
-          <Form.Item label="Note" name="note" rules={rules.note}>
-            <MarkdownEditor
-              onKeyDown={editorKeyDown}
-              highlightBorder={isNoteChanged}
-            />
-          </Form.Item>
-          <Form.Item {...btnLayout}>
-            <Button
-              className={styles.btn}
-              type="primary"
-              htmlType="submit"
-              disabled={canNotSubmit}
-              loading={isSubmitting}
-            >
-              Submit
-            </Button>
-            <Button className={styles.btn} onClick={cleanNote}>
-              Clean Note
-            </Button>
-          </Form.Item>
-        </Form>
+        <Spin spinning={isSubmitting}>
+          <Form
+            {...formLayout}
+            form={createSentenceForm}
+            name="createSentenceForm"
+            initialValues={initialValue}
+            onFinish={onFinish}
+            autoComplete="off"
+          >
+            <Form.Item label="Sentence" name="sentence" rules={rules.sentence}>
+              <Input autoFocus onKeyDown={editorKeyDown} />
+            </Form.Item>
+            <Form.Item label="Note" name="note" rules={rules.note}>
+              <MarkdownEditor
+                onKeyDown={editorKeyDown}
+                highlightBorder={isNoteChanged}
+              />
+            </Form.Item>
+            <Form.Item {...btnLayout}>
+              <Button
+                className={styles.btn}
+                type="primary"
+                htmlType="submit"
+                disabled={canNotSubmit}
+                loading={isSubmitting}
+              >
+                Submit
+              </Button>
+              <Button className={styles.btn} onClick={cleanNote}>
+                Clean Note
+              </Button>
+            </Form.Item>
+          </Form>
+        </Spin>
       </div>
     </EnLayout>
   );

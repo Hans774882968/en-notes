@@ -99,8 +99,7 @@ function useDashboard() {
 
 // 必须拆分，否则拿不到 themeContext
 function Dashboard() {
-  const themeContext = useThemeContext();
-  const mdEditorThemeName = themeContext?.mdEditorThemeName;
+  const { mdEditorThemeName } = useThemeContext();
 
   const {
     cnWordDateArr,

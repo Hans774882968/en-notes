@@ -12,6 +12,8 @@ const MDEditor = dynamic(
   { ssr: false }
 );
 
+// TODO: 目前似乎无法做到 disable editor https://github.com/uiwjs/react-md-editor/issues/269
+
 interface EditorProps {
   value?: string
   onChange?: (val?: string) => void

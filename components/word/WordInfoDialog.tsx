@@ -1,4 +1,3 @@
-import { GetWordParams, GetWordResp } from '@/lib/backend/paramAndResp';
 import { Word } from '@/db/models/types';
 import { formLayout } from '@/lib/frontend/const';
 import { useState } from 'react';
@@ -8,9 +7,8 @@ import LoadingInContainer from '../common/LoadingInContainer';
 import MarkdownPreviewer from '../MarkdownPreviewer';
 import Modal, { ModalProps } from 'antd/lib/modal';
 import NoSynonymsRecorded from './NoSynonymsRecorded';
-import Request from '@/lib/frontend/request';
 import SentencesItem from './SentencesItem';
-import useSWR from 'swr';
+import useGetWord from '@/lib/frontend/hooks/api/useGetWord';
 
 /**
  * 单词详情对话框
@@ -22,24 +20,6 @@ interface Props {
   externalData?: Word
   open: boolean
   onCancel: ModalProps['onCancel']
-}
-
-interface UseGetWordParams {
-  params: GetWordParams
-  dialogOpen: boolean
-  externalData?: Word
-}
-
-function useGetWord({ params, dialogOpen, externalData }: UseGetWordParams) {
-  const shouldSendReq = dialogOpen && !externalData;
-  const { data, isLoading } = useSWR(
-    shouldSendReq ? ['/api/getWord', params] : null,
-    ([url, params]) => Request.get<GetWordResp>({ params, url })
-  );
-  if (!shouldSendReq) {
-    return { isLoading: false, word: externalData };
-  }
-  return { isLoading, ...data };
 }
 
 export default function WordInfoDialog({ word, open, onCancel, externalData }: Props) {

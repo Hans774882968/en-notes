@@ -12,6 +12,7 @@ import LoadingInContainer from '@/components/common/LoadingInContainer';
 import Message from 'antd/lib/message';
 import Request from '@/lib/frontend/request';
 import Select from 'antd/lib/select';
+import Spin from 'antd/lib/spin';
 
 export default function LinkWordAndSentenceForm() {
   const [encodedSentenceInfo] = useQueryState('sentence', parseAsString.withDefault(''));
@@ -104,42 +105,44 @@ export default function LinkWordAndSentenceForm() {
   };
 
   return (
-    <Form
-      {...formLayout}
-      onFinish={onFinish}
-    >
-      <Form.Item label="Word">
-        <AutoComplete
-          placeholder="Search word"
-          options={wordSearchResultOptions}
-          onChange={handleWordChange}
-          onSearch={handleWordSearch}
-          value={word}
-          notFoundContent={isFetchingWordOptions ? <LoadingInContainer /> : null}
-        />
-      </Form.Item>
-      <Form.Item label="Sentence">
-        <Select
-          placeholder="Search sentence"
-          options={sentenceSearchResultOptions}
-          onChange={handleSentenceChange}
-          onSearch={handleSentenceSearch}
-          showSearch
-          filterOption={false}
-          value={sentenceId}
-          notFoundContent={isFetchingSentenceOptions ? <LoadingInContainer /> : null}
-        />
-      </Form.Item>
-      <Form.Item {...btnLayout}>
-        <Button
-          type="primary"
-          htmlType="submit"
-          disabled={canNotSubmit}
-          loading={isSubmitting}
-        >
-          Link
-        </Button>
-      </Form.Item>
-    </Form>
+    <Spin spinning={isSubmitting}>
+      <Form
+        {...formLayout}
+        onFinish={onFinish}
+      >
+        <Form.Item label="Word">
+          <AutoComplete
+            placeholder="Search word"
+            options={wordSearchResultOptions}
+            onChange={handleWordChange}
+            onSearch={handleWordSearch}
+            value={word}
+            notFoundContent={isFetchingWordOptions ? <LoadingInContainer /> : null}
+          />
+        </Form.Item>
+        <Form.Item label="Sentence">
+          <Select
+            placeholder="Search sentence"
+            options={sentenceSearchResultOptions}
+            onChange={handleSentenceChange}
+            onSearch={handleSentenceSearch}
+            showSearch
+            filterOption={false}
+            value={sentenceId}
+            notFoundContent={isFetchingSentenceOptions ? <LoadingInContainer /> : null}
+          />
+        </Form.Item>
+        <Form.Item {...btnLayout}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            disabled={canNotSubmit}
+            loading={isSubmitting}
+          >
+            Link
+          </Button>
+        </Form.Item>
+      </Form>
+    </Spin>
   );
 }

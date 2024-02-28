@@ -5,12 +5,14 @@ import { Word } from '@/db/models/types';
 import { removeFalsyAttrs } from '@/lib/utils';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
+import CardDialog from '@/components/previewCard/CardDialog';
 import DatePicker from 'antd/lib/date-picker';
 import EnLayout from '@/components/EnLayout';
 import EnNotesTable from '@/components/common/EnNotesTable';
 import Input from 'antd/lib/input';
 import QuestionCircleOutlined from '@ant-design/icons/QuestionCircleOutlined';
 import Request from '@/lib/frontend/request';
+import Space from 'antd/lib/space';
 import Tooltip from 'antd/lib/tooltip';
 import WordInfoDialog from '@/components/word/WordInfoDialog';
 import styles from './list.module.scss';
@@ -38,16 +40,28 @@ function ComplexityTooltip() {
 }
 
 export default function List() {
+  // 正常用户不会设法（可以做到）去同时开两个对话框，为了省事， currentWord 先共用了
   const [currentWord, setCurrentWord] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openDialog = (word: string) => {
+  const [isWordInfoDialogOpen, setIsWordInfoDialogOpen] = useState(false);
+  const [isWordCardDialogOpen, setIsWordCardDialogOpen] = useState(false);
+
+  const openWordInfoDialog = (word: string) => {
     setCurrentWord(word);
-    setIsModalOpen(true);
+    setIsWordInfoDialogOpen(true);
   };
 
-  const handleDialogCancel = () => {
-    setIsModalOpen(false);
+  const handleWordInfoDialogCancel = () => {
+    setIsWordInfoDialogOpen(false);
+  };
+
+  const openWordCardDialog = (word: string) => {
+    setCurrentWord(word);
+    setIsWordCardDialogOpen(true);
+  };
+
+  const handleWordCardDialogCancel = () => {
+    setIsWordCardDialogOpen(false);
   };
 
   const [cacheWords, setCacheWords] = useState<Word[]>([]);
@@ -80,7 +94,12 @@ export default function List() {
     },
     {
       dataIndex: 'word',
-      render: (word: string) => (<Button type="link" onClick={() => openDialog(word)}>Detail</Button>),
+      render: (word: string) => (
+        <Space>
+          <Button type="link" onClick={() => openWordInfoDialog(word)}>Detail</Button>
+          <Button type="link" onClick={() => openWordCardDialog(word)}>Preview Card</Button>
+        </Space>
+      ),
       title: 'Action'
     }
   ];
@@ -132,8 +151,14 @@ export default function List() {
     <EnLayout>
       <div>
         <WordInfoDialog
-          onCancel={handleDialogCancel}
-          open={isModalOpen}
+          onCancel={handleWordInfoDialogCancel}
+          open={isWordInfoDialogOpen}
+          word={currentWord}
+          externalData={dialogExternalData}
+        />
+        <CardDialog
+          onCancel={handleWordCardDialogCancel}
+          open={isWordCardDialogOpen}
           word={currentWord}
           externalData={dialogExternalData}
         />

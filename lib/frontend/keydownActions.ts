@@ -1,5 +1,5 @@
 import { KeyboardEvent } from 'react';
-import { isMac, isWindows } from './get-platform';
+import { isMac, isWindows } from './getPlatform';
 
 export function ctrlSAction (cb?: () => void) {
   return (e: KeyboardEvent) => {

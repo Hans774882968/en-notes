@@ -24,6 +24,7 @@ export default function MarkdownPreviewer({ value }: Props) {
         className={styles.editor}
         value={value}
         preview="preview"
+        hideToolbar={true}
         previewOptions={{
           rehypePlugins: [[rehypeSanitize]]
         }}

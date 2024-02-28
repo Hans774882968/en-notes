@@ -2,6 +2,7 @@ import { Resp } from '../resp';
 import Message from 'antd/lib/message';
 import RequestCanceler from './requestCanceler';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import errorGeneralHelper from './errorGeneralHelper';
 import fileDownload from 'js-file-download';
 
 axios.interceptors.request.use(
@@ -41,17 +42,13 @@ export default class Request {
           reject(err);
           return;
         }
-        const content = err?.message || 'request error';
-        console.error(content, err);
-        Message.error({
-          content
-        });
+        errorGeneralHelper(err, 'request error');
         reject(err);
       });
     });
   }
 
-  static get<T = any>({ url, params = {}}: { url: string, params?: Record<string, any> }) {
+  static get<T = any>({ url, params = {} }: { url: string, params?: Record<string, any> }) {
     return this.axiosObjectResolver<T>(
       axios.get(url, {
         params

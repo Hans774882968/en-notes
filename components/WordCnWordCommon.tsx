@@ -17,6 +17,7 @@ import MarkdownEditor from '@/components/MarkdownEditor';
 import Message from 'antd/lib/message';
 import QuestionCircleOutlined from '@ant-design/icons/QuestionCircleOutlined';
 import SearchToolTip from './SearchToolTip';
+import Spin from 'antd/lib/spin';
 import Tooltip from 'antd/lib/tooltip';
 import styles from './WordCnWordCommon.module.scss';
 
@@ -183,64 +184,66 @@ export default function WordCnWordCommon({
   return (
     <EnLayout>
       <div className={styles.word}>
-        <Form
-          {...formLayout}
-          form={editWordForm}
-          name="editWordForm"
-          initialValues={initialValue}
-          onFinish={onFinish}
-          autoComplete="off"
-        >
-          <ModeField stateText={getStateText()} />
+        <Spin spinning={isSubmitting}>
+          <Form
+            {...formLayout}
+            form={editWordForm}
+            name="editWordForm"
+            initialValues={initialValue}
+            onFinish={onFinish}
+            autoComplete="off"
+          >
+            <ModeField stateText={getStateText()} />
 
-          <Form.Item label={<SearchToolTip />}>
-            <AutoComplete
-              autoFocus
-              placeholder="Plz input keyword"
-              options={searchResultOptions}
-              onChange={handleWordChange}
-              onSearch={debounceHandleWordSearch}
-              onBlur={getWord}
-              onInputKeyDown={(e) => preventAccidentSubmit(e)}
-              notFoundContent={isFetchingOptions ? <LoadingInContainer /> : null}
-            />
-          </Form.Item>
+            <Form.Item label={<SearchToolTip />}>
+              <AutoComplete
+                autoFocus
+                placeholder="Plz input keyword"
+                options={searchResultOptions}
+                onChange={handleWordChange}
+                onSearch={debounceHandleWordSearch}
+                onBlur={getWord}
+                onInputKeyDown={(e) => preventAccidentSubmit(e)}
+                notFoundContent={isFetchingOptions ? <LoadingInContainer /> : null}
+              />
+            </Form.Item>
 
-          {isFetchRecordState() && <EditPageSkeleton fieldCountBeforeNoteField={4} />}
+            {isFetchRecordState() && <EditPageSkeleton fieldCountBeforeNoteField={4} />}
 
-          {isUpdateState() && readOnlyInfo}
-
-          {
-            shouldShowNoteField && (
-              <Form.Item label="Note" name="note" rules={rules.note}>
-                <MarkdownEditor
-                  onKeyDown={mdEditorKeyDown}
-                  highlightBorder={isNoteChanged}
-                />
-              </Form.Item>
-            )
-          }
-
-          <Form.Item {...btnLayout}>
-            <Button
-              className={styles.btn}
-              type="primary"
-              htmlType="submit"
-              disabled={canNotSubmit}
-              loading={isSubmitting}
-            >
-              Submit
-            </Button>
+            {isUpdateState() && readOnlyInfo}
 
             {
               shouldShowNoteField && (
-                <Button className={styles.btn} onClick={cleanNote}>
-                  Clean Note
-                </Button>
+                <Form.Item label="Note" name="note" rules={rules.note}>
+                  <MarkdownEditor
+                    onKeyDown={mdEditorKeyDown}
+                    highlightBorder={isNoteChanged}
+                  />
+                </Form.Item>
               )
             }
-          </Form.Item>
-        </Form>
+
+            <Form.Item {...btnLayout}>
+              <Button
+                className={styles.btn}
+                type="primary"
+                htmlType="submit"
+                disabled={canNotSubmit}
+                loading={isSubmitting}
+              >
+                Submit
+              </Button>
+
+              {
+                shouldShowNoteField && (
+                  <Button className={styles.btn} onClick={cleanNote}>
+                    Clean Note
+                  </Button>
+                )
+              }
+            </Form.Item>
+          </Form>
+        </Spin>
       </div>
     </EnLayout>
   );

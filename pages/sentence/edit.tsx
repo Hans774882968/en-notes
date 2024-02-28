@@ -18,6 +18,7 @@ import RelevantWordsNode from '@/components/word/RelevantWordsNode';
 import Request from '@/lib/frontend/request';
 import SearchToolTip from '@/components/SearchToolTip';
 import Select from 'antd/lib/select';
+import Spin from 'antd/lib/spin';
 import styles from './edit.module.scss';
 import useCreateUpdateStateMachine from '@/lib/frontend/hooks/useCreateUpdateStateMachine';
 
@@ -210,70 +211,72 @@ export default function Edit() {
   return (
     <EnLayout>
       <div className={styles.sentence}>
-        <Form
-          {...formLayout}
-          form={editSentenceForm}
-          name="editSentenceForm"
-          initialValues={initialValue}
-          onFinish={onFinish}
-          autoComplete="off"
-        >
-          <Form.Item label={<SearchToolTip />}>
-            <Select
-              autoFocus
-              placeholder="Search sentence"
-              options={searchResultOptions}
-              onChange={handleSentenceChange}
-              onSearch={handleSentenceSearch}
-              onBlur={getSentence}
-              showSearch
-              filterOption={false}
-              notFoundContent={isFetchingOptions ? <LoadingInContainer /> : null}
-            />
-          </Form.Item>
-          {isFetchRecordState() && <EditPageSkeleton fieldCountBeforeNoteField={4} />}
-          {
-            isUpdateState() && (
-              <>
-                <SentenceReadOnlyInfo
-                  belongSentence={belongSentence}
-                  createTime={createTime}
-                  modifyTime={modifyTime}
-                  words={relevantWords}
-                />
-                <Form.Item label="Sentence" name="sentence" rules={rules.sentence}>
-                  <Input onKeyDown={editorKeyDown} />
-                </Form.Item>
-                {/* 这里使用 dependencies ，是因为 note 字段的校验其实是表单的总校验，目的是在 sentence 变化时也触发该校验 */}
-                {/* TODO: 找到更好的做法 */}
-                <Form.Item label="Note" name="note" rules={rules.note} dependencies={['sentence']}>
-                  <MarkdownEditor
-                    onKeyDown={editorKeyDown}
-                    highlightBorder={isNoteChanged}
-                  />
-                </Form.Item>
-              </>
-            )
-          }
-          <Form.Item {...btnLayout}>
-            <Button
-              className={styles.btn}
-              type="primary"
-              htmlType="submit"
-              disabled={canNotSubmit}
-              loading={isSubmitting}
-            >
-              Submit
-            </Button>
+        <Spin spinning={isSubmitting}>
+          <Form
+            {...formLayout}
+            form={editSentenceForm}
+            name="editSentenceForm"
+            initialValues={initialValue}
+            onFinish={onFinish}
+            autoComplete="off"
+          >
+            <Form.Item label={<SearchToolTip />}>
+              <Select
+                autoFocus
+                placeholder="Search sentence"
+                options={searchResultOptions}
+                onChange={handleSentenceChange}
+                onSearch={handleSentenceSearch}
+                onBlur={getSentence}
+                showSearch
+                filterOption={false}
+                notFoundContent={isFetchingOptions ? <LoadingInContainer /> : null}
+              />
+            </Form.Item>
+            {isFetchRecordState() && <EditPageSkeleton fieldCountBeforeNoteField={4} />}
             {
               isUpdateState() && (
-                <Button className={styles.btn} onClick={cleanNote}>
-                  Clean Note
-                </Button>
+                <>
+                  <SentenceReadOnlyInfo
+                    belongSentence={belongSentence}
+                    createTime={createTime}
+                    modifyTime={modifyTime}
+                    words={relevantWords}
+                  />
+                  <Form.Item label="Sentence" name="sentence" rules={rules.sentence}>
+                    <Input onKeyDown={editorKeyDown} />
+                  </Form.Item>
+                  {/* 这里使用 dependencies ，是因为 note 字段的校验其实是表单的总校验，目的是在 sentence 变化时也触发该校验 */}
+                  {/* TODO: 找到更好的做法 */}
+                  <Form.Item label="Note" name="note" rules={rules.note} dependencies={['sentence']}>
+                    <MarkdownEditor
+                      onKeyDown={editorKeyDown}
+                      highlightBorder={isNoteChanged}
+                    />
+                  </Form.Item>
+                </>
               )
             }
-          </Form.Item>
-        </Form>
+            <Form.Item {...btnLayout}>
+              <Button
+                className={styles.btn}
+                type="primary"
+                htmlType="submit"
+                disabled={canNotSubmit}
+                loading={isSubmitting}
+              >
+                Submit
+              </Button>
+              {
+                isUpdateState() && (
+                  <Button className={styles.btn} onClick={cleanNote}>
+                    Clean Note
+                  </Button>
+                )
+              }
+            </Form.Item>
+          </Form>
+        </Spin>
       </div>
     </EnLayout>
   );

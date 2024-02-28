@@ -3,7 +3,7 @@ import { useThemeContext } from '../ThemeContext';
 import styles from './ThemeBtn.module.scss';
 
 export default function ThemeBtn() {
-  const { mdEditorThemeName, preferDarkTheme, preferDarkThemeSetter } = useThemeContext()!;
+  const { mdEditorThemeName, preferDarkTheme, preferDarkThemeSetter } = useThemeContext();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-color-mode', mdEditorThemeName);

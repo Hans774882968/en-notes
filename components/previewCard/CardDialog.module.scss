@@ -1,0 +1,10 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .toolbar {
+    display: flex;
+    gap: 16px;
+  }
+}

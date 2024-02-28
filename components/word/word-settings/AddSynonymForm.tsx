@@ -10,6 +10,7 @@ import Form from 'antd/lib/form';
 import LoadingInContainer from '@/components/common/LoadingInContainer';
 import Message from 'antd/lib/message';
 import Request from '@/lib/frontend/request';
+import Spin from 'antd/lib/spin';
 
 export default function AddSynonymForm() {
   const [lhs, setLhs] = useQueryState('word1', parseAsString.withDefault(''));
@@ -100,40 +101,42 @@ export default function AddSynonymForm() {
   };
 
   return (
-    <Form
-      {...formLayout}
-      onFinish={onFinish}
-    >
-      <Form.Item label="Word 1">
-        <AutoComplete
-          placeholder="Search word"
-          options={lhsWordSearchResultOptions}
-          onChange={handleLhsWordChange}
-          onSearch={handleLhsWordSearch}
-          value={lhs}
-          notFoundContent={isFetchingLhsOptions ? <LoadingInContainer /> : null}
-        />
-      </Form.Item>
-      <Form.Item label="Word 2">
-        <AutoComplete
-          placeholder="Search word"
-          options={rhsWordSearchResultOptions}
-          onChange={handleRhsWordChange}
-          onSearch={handleRhsWordSearch}
-          value={rhs}
-          notFoundContent={isFetchingRhsOptions ? <LoadingInContainer /> : null}
-        />
-      </Form.Item>
-      <Form.Item {...btnLayout}>
-        <Button
-          type="primary"
-          htmlType="submit"
-          disabled={canNotSubmit}
-          loading={isSubmitting}
-        >
-          Add Synonym
-        </Button>
-      </Form.Item>
-    </Form>
+    <Spin spinning={isSubmitting}>
+      <Form
+        {...formLayout}
+        onFinish={onFinish}
+      >
+        <Form.Item label="Word 1">
+          <AutoComplete
+            placeholder="Search word"
+            options={lhsWordSearchResultOptions}
+            onChange={handleLhsWordChange}
+            onSearch={handleLhsWordSearch}
+            value={lhs}
+            notFoundContent={isFetchingLhsOptions ? <LoadingInContainer /> : null}
+          />
+        </Form.Item>
+        <Form.Item label="Word 2">
+          <AutoComplete
+            placeholder="Search word"
+            options={rhsWordSearchResultOptions}
+            onChange={handleRhsWordChange}
+            onSearch={handleRhsWordSearch}
+            value={rhs}
+            notFoundContent={isFetchingRhsOptions ? <LoadingInContainer /> : null}
+          />
+        </Form.Item>
+        <Form.Item {...btnLayout}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            disabled={canNotSubmit}
+            loading={isSubmitting}
+          >
+            Add Synonym
+          </Button>
+        </Form.Item>
+      </Form>
+    </Spin>
   );
 }
