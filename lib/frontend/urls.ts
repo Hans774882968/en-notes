@@ -1,6 +1,7 @@
 export const urls = {
   cnWord: {
-    edit: '/cn-word'
+    edit: '/english-topic/edit',
+    list: '/english-topic/list'
   },
   dashboard: {
     index: '/dashboard'

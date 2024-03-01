@@ -11,13 +11,13 @@ const MarkdownPreview = dynamic(
 );
 
 interface Props {
-  word: string
+  title: string
   note: string
   cardTheme: CardThemeClassNames
 }
 
-const WordPreviewCard = forwardRef<HTMLDivElement, Props>(
-  ({ word, note, cardTheme }, ref) => {
+const CnWordPreviewCard = forwardRef<HTMLDivElement, Props>(
+  ({ title, note, cardTheme }, ref) => {
     return (
       <div
         ref={ref}
@@ -29,7 +29,7 @@ const WordPreviewCard = forwardRef<HTMLDivElement, Props>(
           )
         }
         <div className={`${styles.inner} ${styles[cardTheme]}`}>
-          <h1 className={`${styles.title} ${styles[cardTheme]}`}>{word}</h1>
+          <h1 className={`${styles.title} ${styles[cardTheme]}`}>{title}</h1>
           <MarkdownPreview
             className={`${styles.markdownPreview} ${styles[cardTheme]}`}
             source={note}
@@ -41,6 +41,6 @@ const WordPreviewCard = forwardRef<HTMLDivElement, Props>(
   }
 );
 
-WordPreviewCard.displayName = 'WordPreviewCard';
+CnWordPreviewCard.displayName = 'CnWordPreviewCard';
 
-export default WordPreviewCard;
+export default CnWordPreviewCard;

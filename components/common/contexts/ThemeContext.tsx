@@ -4,9 +4,9 @@ import theme from 'antd/lib/theme';
 import useLocalStorageState from 'use-local-storage-state';
 
 type ContextType = {
-  preferDarkTheme: boolean,
-  preferDarkThemeSetter(preferDarkTheme: boolean): void,
-  mdEditorThemeName: MdEditorThemeName,
+  preferDarkTheme: boolean
+  preferDarkThemeSetter(preferDarkTheme: boolean): void
+  mdEditorThemeName: MdEditorThemeName
 } | null;
 
 const ThemeContext = createContext<ContextType>(null);

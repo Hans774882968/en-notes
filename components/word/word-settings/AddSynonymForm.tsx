@@ -1,6 +1,7 @@
 import { AddWordSynonymResp, WordSearchResp } from '@/lib/backend/paramAndResp';
 import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayout } from '@/lib/frontend/const';
 import { Word } from '@/db/models/types';
+import { apiUrls } from '@/lib/backend/urls';
 import { parseAsString, useQueryState } from 'nuqs';
 import { useDebouncedCallback } from 'use-debounce';
 import { useState } from 'react';
@@ -41,7 +42,7 @@ export default function AddSynonymForm() {
       }
       setIsFetchingLhsOptions(true);
       try {
-        const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
+        const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: apiUrls.word.search });
         setLhsWordSearchResult(result);
       } catch (e) {
         return;
@@ -65,7 +66,7 @@ export default function AddSynonymForm() {
       }
       setIsFetchingRhsOptions(true);
       try {
-        const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
+        const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: apiUrls.word.search });
         setRhsWordSearchResult(result);
       } catch (e) {
         return;

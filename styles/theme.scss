@@ -1,11 +1,13 @@
 $themes: (
   light: (textColor: black,
-    navBarBgColor: #f5f5f5,
+    navbarBgColor: #f5f5f5,
+    navbarLinkColor: #1677ff,
     pageContainerBgColor: #f5f5f5,
     mdEditorModifiedBorderColor: #116329,
   ),
   dark: (textColor: rgb(255 255 255 / 85%),
-    navBarBgColor: #161b22,
+    navbarBgColor: #161b22,
+    navbarLinkColor: #1668dc,
     pageContainerBgColor: black,
     mdEditorModifiedBorderColor: #7ee787,
   )

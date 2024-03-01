@@ -2,6 +2,7 @@ import { BelongSentence } from '@/lib/frontend/encDecSentenceInfo';
 import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayout } from '@/lib/frontend/const';
 import { GetSentenceResp, SentenceSearchResp, UpdateSentenceResp } from '@/lib/backend/paramAndResp';
 import { Sentence, SentenceIdType, Word } from '@/db/models/types';
+import { apiUrls } from '@/lib/backend/urls';
 import { ctrlSAction } from '@/lib/frontend/keydownActions';
 import { useBeforeUnload } from 'react-use';
 import { useDebouncedCallback } from 'use-debounce';
@@ -121,7 +122,7 @@ export default function Edit() {
       }
       setIsFetchingOptions(true);
       try {
-        const { result } = await Request.get<SentenceSearchResp>({ params: { search: newSentence }, url: '/api/sentence/search' });
+        const { result } = await Request.get<SentenceSearchResp>({ params: { search: newSentence }, url: apiUrls.sentence.search });
         setSearchResult(result);
       } catch (e) {
         return;
@@ -141,7 +142,7 @@ export default function Edit() {
       return;
     }
     try {
-      const getSentenceRes = await Request.get<GetSentenceResp>({ params: { sentence: sentenceId }, url: '/api/getSentence' });
+      const getSentenceRes = await Request.get<GetSentenceResp>({ params: { sentence: sentenceId }, url: apiUrls.sentence.get });
       sentence = getSentenceRes.sentence;
     } catch (e) {
       Message.error({ content: 'get sentence info failed' });
@@ -190,7 +191,7 @@ export default function Edit() {
     try {
       await Request.post<UpdateSentenceResp>({
         data: params,
-        url: '/api/updateSentence'
+        url: apiUrls.sentence.edit
       });
       Message.success('Update sentence success');
     } catch (e) {

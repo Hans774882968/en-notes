@@ -92,9 +92,26 @@ export type UpsertWordResp = {
   word?: Word
 };
 
+export type GetCnWordParams = {
+  word: string
+};
+
 export type GetCnWordResp = {
   word: CnWord | null
 };
+
+export type GetCnWordListParams = TableParams<{
+  word?: string
+  note?: string
+  ctime?: string[]
+  mtime?: string[]
+}>;
+
+export type CnWordTableItem = CnWord & {
+  complexity: number
+};
+
+export type GetCnWordListResp = TableResp<CnWordTableItem>;
 
 export type UpsertCnWordResp = {
   created: boolean

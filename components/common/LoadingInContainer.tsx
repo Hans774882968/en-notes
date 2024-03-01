@@ -1,10 +1,12 @@
-import Spin from 'antd/lib/spin';
+import Spin, { SpinProps } from 'antd/lib/spin';
 import styles from './LoadingInContainer.module.scss';
 
-export default function LoadingInContainer() {
+type Props = SpinProps;
+
+export default function LoadingInContainer(props: Props) {
   return (
     <div className={styles.container}>
-      <Spin />
+      <Spin {...props} />
     </div>
   );
 }

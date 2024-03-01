@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { ThemeProvider } from './ThemeContext';
+import { ThemeProvider } from './common/contexts/ThemeContext';
 import EnMenu from './EnMenu';
 import Head from 'next/head';
 import Layout from 'antd/lib/layout';

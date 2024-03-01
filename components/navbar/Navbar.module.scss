@@ -13,7 +13,7 @@
   box-sizing: border-box;
 
   @include useTheme {
-    background-color: getThemeVar('navBarBgColor')
+    background-color: getThemeVar('navbarBgColor')
   }
 
   .navbarCol {
@@ -22,7 +22,7 @@
     gap: 24px;
   }
 
-  .pluginName {
+  .appName {
     font-size: 18px;
     font-weight: bold;
     transition: color .3s;
@@ -34,5 +34,24 @@
 
   .selectLang {
     min-width: 100px;
+  }
+
+  .link {
+    font-size: 18px;
+    font-weight: 500;
+
+    @include useTheme {
+      color: getThemeVar('textColor')
+    }
+
+    .linkSvg {
+      margin-left: 6px;
+    }
+
+    &:hover {
+      @include useTheme {
+        color: getThemeVar('navbarLinkColor')
+      }
+    }
   }
 }

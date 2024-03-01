@@ -1,12 +1,14 @@
+import { CN_WORD_COMPLEXITY_INTRO } from '@/lib/frontend/const';
 import { CardThemeProvider } from '@/components/common/contexts/CardThemeContext';
+import { CnWord } from '@/db/models/types';
 import { Dayjs } from 'dayjs';
-import { GetWordListParams, GetWordListResp } from '@/lib/backend/paramAndResp';
-import { WORD_COMPLEXITY_INTRO } from '@/lib/frontend/const';
-import { Word } from '@/db/models/types';
+import { GetCnWordListParams, GetCnWordListResp } from '@/lib/backend/paramAndResp';
 import { apiUrls } from '@/lib/backend/urls';
 import { removeFalsyAttrs } from '@/lib/utils';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
+import CnWordCardDialog from '@/components/previewCard/CnWordCardDialog';
+import CnWordInfoDialog from '@/components/cnWord/CnWordInfoDialog';
 import ComplexityTooltip from '@/components/list/ComplexityTooltip';
 import DatePicker from 'antd/lib/date-picker';
 import EnLayout from '@/components/EnLayout';
@@ -14,55 +16,49 @@ import EnNotesTable from '@/components/common/EnNotesTable';
 import Input from 'antd/lib/input';
 import Request from '@/lib/frontend/request';
 import Space from 'antd/lib/space';
-import WordCardDialog from '@/components/previewCard/WordCardDialog';
-import WordInfoDialog from '@/components/word/WordInfoDialog';
 
 const { RangePicker } = DatePicker;
 
-type BeforeGetWordListParams = Omit<GetWordListParams, 'ctime' | 'mtime'> & {
+type BeforeGetCnWordListParams = Omit<GetCnWordListParams, 'ctime' | 'mtime'> & {
   ctime?: Dayjs[] | string[]
   mtime?: Dayjs[] | string[]
 }
 
 export default function List() {
   // 正常用户不会设法（可以做到）去同时开两个对话框，为了省事， currentWord 先共用了
-  const [currentWord, setCurrentWord] = useState('');
+  const [currentCnWord, setCurrentCnWord] = useState('');
 
-  const [isWordInfoDialogOpen, setIsWordInfoDialogOpen] = useState(false);
-  const [isWordCardDialogOpen, setIsWordCardDialogOpen] = useState(false);
+  const [isCnWordInfoDialogOpen, setIsCnWordInfoDialogOpen] = useState(false);
+  const [isCnWordCardDialogOpen, setIsCnWordCardDialogOpen] = useState(false);
 
-  const openWordInfoDialog = (word: string) => {
-    setCurrentWord(word);
-    setIsWordInfoDialogOpen(true);
+  const openCnWordInfoDialog = (cnWord: string) => {
+    setCurrentCnWord(cnWord);
+    setIsCnWordInfoDialogOpen(true);
   };
 
-  const handleWordInfoDialogCancel = () => {
-    setIsWordInfoDialogOpen(false);
+  const handleCnWordInfoDialogCancel = () => {
+    setIsCnWordInfoDialogOpen(false);
   };
 
-  const openWordCardDialog = (word: string) => {
-    setCurrentWord(word);
-    setIsWordCardDialogOpen(true);
+  const openCnWordCardDialog = (cnWord: string) => {
+    setCurrentCnWord(cnWord);
+    setIsCnWordCardDialogOpen(true);
   };
 
-  const handleWordCardDialogCancel = () => {
-    setIsWordCardDialogOpen(false);
+  const handleCnWordCardDialogCancel = () => {
+    setIsCnWordCardDialogOpen(false);
   };
 
-  const [cacheWords, setCacheWords] = useState<Word[]>([]);
+  const [cacheCnWords, setCacheCnWords] = useState<CnWord[]>([]);
 
   const columns = [
     {
       dataIndex: 'word',
-      title: 'Word'
+      title: 'Title'
     },
     {
       dataIndex: 'complexity',
-      title: <ComplexityTooltip title={WORD_COMPLEXITY_INTRO} />
-    },
-    {
-      dataIndex: 'synonymCount',
-      title: 'Number of Synonyms'
+      title: <ComplexityTooltip title={CN_WORD_COMPLEXITY_INTRO} />
     },
     {
       dataIndex: 'ctime',
@@ -76,9 +72,8 @@ export default function List() {
       dataIndex: 'word',
       render: (word: string) => (
         <Space>
-          <Button type="link" onClick={() => openWordInfoDialog(word)}>Detail</Button>
-          <Button type="link" onClick={() => openWordCardDialog(word)}>Card</Button>
-          {/* Export Card 直接放外面这个功能的实现难度太大，不做了 */}
+          <Button type="link" onClick={() => openCnWordInfoDialog(word)}>Detail</Button>
+          <Button type="link" onClick={() => openCnWordCardDialog(word)}>Card</Button>
         </Space>
       ),
       title: 'Action'
@@ -89,7 +84,7 @@ export default function List() {
   const searchConfigList = [
     {
       key: 'word',
-      label: 'Word',
+      label: 'Title',
       slot: <Input allowClear />
     },
     {
@@ -109,39 +104,39 @@ export default function List() {
     }
   ];
 
-  const beforeSearch = (params: BeforeGetWordListParams) => {
+  const beforeSearch = (params: BeforeGetCnWordListParams) => {
     params.ctime = params.ctime?.map((item) => typeof item === 'string' ? item : item.format('YYYY-MM-DD 00:00:00'));
     params.mtime = params.mtime?.map((item) => typeof item === 'string' ? item : item.format('YYYY-MM-DD 00:00:00'));
     removeFalsyAttrs(params);
   };
 
-  const getWordList = async (params: GetWordListParams) => {
+  const getCnWordList = async (params: GetCnWordListParams) => {
     try {
-      const res = await Request.post<GetWordListResp>({ data: params, url: apiUrls.word.list });
-      setCacheWords(res.rows);
+      const res = await Request.post<GetCnWordListResp>({ data: params, url: apiUrls.cnWord.list });
+      setCacheCnWords(res.rows);
       return res;
     } catch (e) {
-      setCacheWords([]);
+      setCacheCnWords([]);
       return { rows: [], total: 0 };
     }
   };
 
-  const dialogExternalData = cacheWords.find((item) => item.word === currentWord);
+  const dialogExternalData = cacheCnWords.find((item) => item.word === currentCnWord);
 
   return (
     <EnLayout>
       <div>
-        <WordInfoDialog
-          onCancel={handleWordInfoDialogCancel}
-          open={isWordInfoDialogOpen}
-          word={currentWord}
+        <CnWordInfoDialog
+          onCancel={handleCnWordInfoDialogCancel}
+          open={isCnWordInfoDialogOpen}
+          word={currentCnWord}
           externalData={dialogExternalData}
         />
         <CardThemeProvider>
-          <WordCardDialog
-            onCancel={handleWordCardDialogCancel}
-            open={isWordCardDialogOpen}
-            word={currentWord}
+          <CnWordCardDialog
+            onCancel={handleCnWordCardDialogCancel}
+            open={isCnWordCardDialogOpen}
+            word={currentCnWord}
             externalData={dialogExternalData}
           />
         </CardThemeProvider>
@@ -149,8 +144,8 @@ export default function List() {
           rowKey="word"
           columns={columns}
           searchConfigList={searchConfigList}
-          requestKey={apiUrls.word.list}
-          apiFun={getWordList}
+          requestKey={apiUrls.cnWord.list}
+          apiFun={getCnWordList}
           beforeSearch={beforeSearch}
         />
       </div>

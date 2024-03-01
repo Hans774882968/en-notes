@@ -1,5 +1,6 @@
 import { CnWord } from '@/db/models/types';
 import { CnWordSearchResp, GetCnWordResp, UpsertCnWordResp } from '@/lib/backend/paramAndResp';
+import { apiUrls } from '@/lib/backend/urls';
 import { useState } from 'react';
 import Form from 'antd/lib/form';
 import Request from '@/lib/frontend/request';
@@ -53,7 +54,7 @@ export default function CnWordPage() {
     }
     setIsFetchingOptions(true);
     try {
-      const { result } = await Request.get<CnWordSearchResp>({ params: { search: newWord }, url: '/api/cnWord/search' });
+      const { result } = await Request.get<CnWordSearchResp>({ params: { search: newWord }, url: apiUrls.cnWord.search });
       setSearchResult(result);
     } catch (e) {
       return;
@@ -74,14 +75,14 @@ export default function CnWordPage() {
   };
 
   const getWordReq = async (wordSearchKey: string) => {
-    const getWordRes = await Request.get<GetCnWordResp>({ params: { word: wordSearchKey }, url: '/api/getCnWord' });
+    const getWordRes = await Request.get<GetCnWordResp>({ params: { word: wordSearchKey }, url: apiUrls.cnWord.get });
     return getWordRes.word;
   };
 
   const upsertRequest = async (upsertCnWordParams: any) => {
     const { created } = await Request.post<UpsertCnWordResp>({
       data: upsertCnWordParams,
-      url: '/api/upsertCnWord'
+      url: apiUrls.cnWord.edit
     });
     return created;
   };

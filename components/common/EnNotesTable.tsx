@@ -21,7 +21,8 @@ import useSWR from 'swr';
  * useService 轮子 + apiFun 使用了 useState 的变量，会导致进入页面时不断发送请求的 bug 。改用 swr 后问题解决，原因未知。
  */
 
-/* 改用 swr
+/*
+// 改用 swr
 const useServiceCallback = (
   service: (arg0?: any) => Promise<{}>
 ): CommonObjectType[] => {
@@ -91,6 +92,7 @@ export interface TableRef {
 interface TableProps {
   columns: object[]
   apiFun: (arg0: any) => Promise<TableResp<CommonObjectType>>
+  requestKey: string
   searchConfigList?: SearchProps['config']
   extraProps?: object
   rowKey?: string
@@ -118,6 +120,7 @@ const EnNotesTable = forwardRef<TableRef, TableProps>(
     const {
       columns,
       apiFun,
+      requestKey,
       searchConfigList,
       extraProps,
       rowKey,
@@ -167,7 +170,8 @@ const EnNotesTable = forwardRef<TableRef, TableProps>(
     const [curPageSize, setCurPageSize] = useState(initParams.pageSize);
 
     // const { loading = false, response }: CommonObjectType = useService(apiFun, tableParams);
-    const { isLoading: loading, data: response } = useSWR([tableParams], ([tableParams]) => apiFun(tableParams));
+    // TODO: 这里不得不要求使用者显式给出 requestKey ，否则切换路由时数据会串
+    const { isLoading: loading, data: response } = useSWR([tableParams, requestKey], ([tableParams]) => apiFun(tableParams));
     const { rows: tableData = [], total = -1 } = response || {};
 
     // 执行搜索操作

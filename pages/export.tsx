@@ -1,4 +1,5 @@
 import { AxiosProgressEvent } from 'axios';
+import { apiUrls } from '@/lib/backend/urls';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import EnLayout from '@/components/EnLayout';
@@ -51,7 +52,7 @@ export default function Export() {
           setDownloadPercent(percent);
         },
         params,
-        url: '/api/export'
+        url: apiUrls.export.index
       });
     } catch (e) {
       return;

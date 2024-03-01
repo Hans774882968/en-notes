@@ -68,6 +68,35 @@ export default getConfig;
 
 去年这个插件不会在每次修改文件都自动跑测试的，今年发现新增了这个irritating的特性。根据[官方文档](https://github.com/jest-community/vscode-jest#runmode)，`Ctrl+Shift+P`打开`User Settings`，改下`"jest.runMode": "on-demand"`就行。
 
+### 单测
+
+#### genFileNameAtFrontend
+
+知识点：mock date。根据[参考链接5](https://codewithhugo.com/mocking-the-current-date-in-jest-tests/)：
+
+```ts
+const now = new Date();
+const explicitNow = new Date(Date.now());
+```
+
+两种写法效果相同，但后者mock起来要容易得多。为此，我把原有实现的`const now = new Date();`改成了后者。据此可写出mock代码：
+
+```ts
+describe('genFileNameAtFrontend', () => {
+  const RealDate = Date;
+
+  beforeEach(() => {
+    globalThis.Date.now = jest.fn(() => new Date('2024-02-26 19:00:00').getTime());
+  });
+
+  afterEach(() => {
+    globalThis.Date = RealDate;
+  });
+
+  // ...
+});
+```
+
 ### MarkdownEditor
 
 #### 字数、行数统计
@@ -155,3 +184,4 @@ function onClick() {
 2. https://juejin.cn/post/6969572789581938718
 3. https://zh-hans.react.dev/learn/you-might-not-need-an-effect
 4. next里使用Jest如何解决“不支持`es`模块的`npm`包”：https://github.com/vercel/next.js/discussions/34589
+5. Jest如何mock date：https://codewithhugo.com/mocking-the-current-date-in-jest-tests/

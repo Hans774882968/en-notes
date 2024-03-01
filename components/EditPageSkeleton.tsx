@@ -16,7 +16,7 @@ export default function EditPageSkeleton({ fieldCountBeforeNoteField }: Props) {
     <>
       {skeletonInputs}
       <Form.Item label={<Skeleton.Button active />}>
-        <Skeleton paragraph={{ rows: 10 }} />
+        <Skeleton paragraph={{ rows: 10 }} active />
       </Form.Item>
     </>
   );

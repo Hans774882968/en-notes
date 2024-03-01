@@ -33,7 +33,10 @@ const items: MenuProps['items'] = [
     getItem('List', urls.word.list, <TableOutlined />),
     getItem('Word Settings', urls.word.settings, <SettingOutlined />)
   ]),
-  getItem('English Topic', urls.cnWord.edit, <EditOutlined />),
+  getItem('English Topic', '1-2', <AppstoreOutlined />, [
+    getItem('Edit', urls.cnWord.edit, <EditOutlined />),
+    getItem('List', urls.cnWord.list, <TableOutlined />)
+  ]),
   getItem('Sentence', '1-3', <AppstoreOutlined />, [
     getItem('Create', urls.sentence.create, <EditOutlined />),
     getItem('Edit', urls.sentence.edit, <EditOutlined />)

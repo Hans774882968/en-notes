@@ -1,6 +1,7 @@
 import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayout } from '@/lib/frontend/const';
 import { LinkWordAndSentenceResp, SentenceSearchResp, WordSearchResp } from '@/lib/backend/paramAndResp';
 import { Sentence, Word } from '@/db/models/types';
+import { apiUrls } from '@/lib/backend/urls';
 import { decodeSentenceInfo } from '@/lib/frontend/encDecSentenceInfo';
 import { parseAsString, useQueryState } from 'nuqs';
 import { useDebouncedCallback } from 'use-debounce';
@@ -52,7 +53,7 @@ export default function LinkWordAndSentenceForm() {
       }
       setIsFetchingWordOptions(true);
       try {
-        const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
+        const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: apiUrls.word.search });
         setWordSearchResult(result);
       } catch (e) {
         return;
@@ -76,7 +77,7 @@ export default function LinkWordAndSentenceForm() {
       }
       setIsFetchingSentenceOptions(true);
       try {
-        const { result } = await Request.get<SentenceSearchResp>({ params: { search: newSentence }, url: '/api/sentence/search' });
+        const { result } = await Request.get<SentenceSearchResp>({ params: { search: newSentence }, url: apiUrls.sentence.search });
         setSentenceSearchResult(result);
       } catch (e) {
         return;

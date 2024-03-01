@@ -5,7 +5,8 @@ import {
   WORD_COMPLEXITY_INTRO
 } from '@/lib/frontend/const';
 import { DashboardResp, PieChartItem } from '@/lib/backend/paramAndResp';
-import { useThemeContext } from '@/components/ThemeContext';
+import { apiUrls } from '@/lib/backend/urls';
+import { useThemeContext } from '@/components/common/contexts/ThemeContext';
 import Card from 'antd/lib/card';
 import Col from 'antd/lib/col';
 import EnLayout from '@/components/EnLayout';
@@ -37,7 +38,7 @@ function TotalCard({
 
 function useDashboard() {
   const { data, isLoading } = useSWR(
-    '/api/dashboard/dashboard',
+    apiUrls.dashboard.index,
     (url) => Request.get<DashboardResp>({ url })
   );
 

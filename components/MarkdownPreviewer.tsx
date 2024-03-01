@@ -1,13 +1,14 @@
 import '@uiw/react-markdown-preview/markdown.css';
 import '@uiw/react-md-editor/markdown-editor.css';
 import { getLineCount } from '@/lib/utils';
+import Skeleton from 'antd/lib/skeleton';
 import dynamic from 'next/dynamic';
 import rehypeSanitize from 'rehype-sanitize';
 import styles from './md-editor-custom.module.scss';
 
 const MDEditor = dynamic(
   () => import('@uiw/react-md-editor'),
-  { ssr: false }
+  { loading: () => <Skeleton paragraph={{ rows: 5 }} active />, ssr: false }
 );
 
 interface Props {

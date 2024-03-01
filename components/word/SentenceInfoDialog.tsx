@@ -1,5 +1,6 @@
 import { GetSentenceParams, GetSentenceResp } from '@/lib/backend/paramAndResp';
 import { SentenceIdType } from '@/db/models/types';
+import { apiUrls } from '@/lib/backend/urls';
 import { formLayout } from '@/lib/frontend/const';
 import Form from 'antd/lib/form';
 import LoadingInContainer from '../common/LoadingInContainer';
@@ -18,7 +19,7 @@ interface Props {
 
 function useGetSentence(params: GetSentenceParams, dialogOpen: boolean) {
   const { data, isLoading } = useSWR(
-    dialogOpen ? ['/api/getSentence', params] : null,
+    dialogOpen ? [apiUrls.sentence.get, params] : null,
     ([url, params]) => Request.get<GetSentenceResp>({ params, url })
   );
   return { isLoading, ...data };

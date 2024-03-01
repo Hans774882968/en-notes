@@ -1,5 +1,6 @@
 import { GetWordResp, UpsertWordResp, WordSearchResp } from '@/lib/backend/paramAndResp';
 import { Sentence, Word } from '@/db/models/types';
+import { apiUrls } from '@/lib/backend/urls';
 import { useState } from 'react';
 import Form from 'antd/lib/form';
 import Request from '@/lib/frontend/request';
@@ -42,7 +43,7 @@ export default function WordPage() {
     }
     setIsFetchingOptions(true);
     try {
-      const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: '/api/word/search' });
+      const { result } = await Request.get<WordSearchResp>({ params: { search: newWord }, url: apiUrls.word.search });
       setSearchResult(result);
     } catch (e) {
       return;
@@ -67,14 +68,14 @@ export default function WordPage() {
   };
 
   const getWordReq = async (wordSearchKey: string) => {
-    const getWordRes = await Request.get<GetWordResp>({ params: { word: wordSearchKey }, url: '/api/getWord' });
+    const getWordRes = await Request.get<GetWordResp>({ params: { word: wordSearchKey }, url: apiUrls.word.get });
     return getWordRes.word;
   };
 
   const upsertRequest = async (upsertWordParams: any) => {
     const { created } = await Request.post<UpsertWordResp>({
       data: upsertWordParams,
-      url: '/api/upsertWord'
+      url: apiUrls.word.edit
     });
     return created;
   };

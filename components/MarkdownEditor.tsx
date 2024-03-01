@@ -3,13 +3,14 @@ import '@uiw/react-md-editor/markdown-editor.css';
 import { KeyboardEventHandler, useState } from 'react';
 import { Statistics } from '@uiw/react-md-editor';
 import { getLineCount } from '@/lib/utils';
+import Skeleton from 'antd/lib/skeleton';
 import dynamic from 'next/dynamic';
 import rehypeSanitize from 'rehype-sanitize';
 import styles from './md-editor-custom.module.scss';
 
 const MDEditor = dynamic(
   () => import('@uiw/react-md-editor'),
-  { ssr: false }
+  { loading: () => <Skeleton paragraph={{ rows: 5 }} active />, ssr: false }
 );
 
 // TODO: 目前似乎无法做到 disable editor https://github.com/uiwjs/react-md-editor/issues/269

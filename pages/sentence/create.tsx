@@ -1,4 +1,5 @@
 import { CreateSentenceResp } from '@/lib/backend/paramAndResp';
+import { apiUrls } from '@/lib/backend/urls';
 import { btnLayout, formLayout } from '@/lib/frontend/const';
 import { ctrlSAction } from '@/lib/frontend/keydownActions';
 import { useBeforeUnload } from 'react-use';
@@ -53,7 +54,7 @@ export default function Create() {
     try {
       await Request.post<CreateSentenceResp>({
         data: createSentenceFormData,
-        url: '/api/createSentence'
+        url: apiUrls.sentence.create
       });
       setLastSubmittedSentence(sentenceFieldValue);
       setLastSubmittedNote(noteFieldValue);
