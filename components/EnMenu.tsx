@@ -39,7 +39,8 @@ const items: MenuProps['items'] = [
   ]),
   getItem('Sentence', '1-3', <AppstoreOutlined />, [
     getItem('Create', urls.sentence.create, <EditOutlined />),
-    getItem('Edit', urls.sentence.edit, <EditOutlined />)
+    getItem('Edit', urls.sentence.edit, <EditOutlined />),
+    getItem('List', urls.sentence.list, <TableOutlined />)
   ]),
   getItem('Export', urls.export.index, <ExportOutlined />),
   getItem('Dashboard', urls.dashboard.index, <DashboardOutlined />)

@@ -1,32 +1,26 @@
-import { GetSentenceParams, GetSentenceResp } from '@/lib/backend/paramAndResp';
-import { SentenceIdType } from '@/db/models/types';
-import { apiUrls } from '@/lib/backend/urls';
+import { Sentence, SentenceIdType } from '@/db/models/types';
 import { formLayout } from '@/lib/frontend/const';
 import Form from 'antd/lib/form';
 import LoadingInContainer from '../common/LoadingInContainer';
 import MarkdownPreviewer from '../MarkdownPreviewer';
 import Modal, { ModalProps } from 'antd/lib/modal';
 import RelevantWordsNode from './RelevantWordsNode';
-import Request from '@/lib/frontend/request';
-import useSWR from 'swr';
+import useGetSentence from '@/lib/frontend/hooks/api/useGetSentence';
 
 interface Props {
   sentenceId: SentenceIdType
   sentence: string
   open: boolean
   onCancel: ModalProps['onCancel']
+  externalData?: Sentence
 }
 
-function useGetSentence(params: GetSentenceParams, dialogOpen: boolean) {
-  const { data, isLoading } = useSWR(
-    dialogOpen ? [apiUrls.sentence.get, params] : null,
-    ([url, params]) => Request.get<GetSentenceResp>({ params, url })
-  );
-  return { isLoading, ...data };
-}
-
-export default function SentenceInfoDialog({ sentenceId, sentence, open, onCancel }: Props) {
-  const { sentence: sentenceRecord } = useGetSentence({ sentence: sentenceId }, open);
+export default function SentenceInfoDialog({ sentenceId, sentence, open, onCancel, externalData }: Props) {
+  const { sentence: sentenceRecord } = useGetSentence({
+    dialogOpen: open,
+    externalData,
+    params: { sentence: sentenceId }
+  });
 
   return (
     <Modal

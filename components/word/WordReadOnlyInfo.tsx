@@ -2,8 +2,8 @@ import { Sentence, Word } from '@/db/models/types';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import Form from 'antd/lib/form';
-import NoSynonymsRecorded from './NoSynonymsRecorded';
 import SentencesItem from './SentencesItem';
+import SynonymsDisplay from './SynonymsDisplay';
 import WordInfoDialog from './WordInfoDialog';
 
 interface SynonymsNodeProps {
@@ -24,11 +24,11 @@ function SynonymsNode({ belongWord, synonyms }: SynonymsNodeProps) {
     setIsModalOpen(false);
   };
 
-  const synonymsNode = synonyms.length ? (
+  const synonymsChildren = synonyms.length ? (
     synonyms.map(({ word }) => (
       <Button key={word} type="link" onClick={() => openDialog(word)}>{word}</Button>
     ))
-  ) : <NoSynonymsRecorded belongWord={belongWord} />;
+  ) : null;
 
   return (
     <>
@@ -38,7 +38,9 @@ function SynonymsNode({ belongWord, synonyms }: SynonymsNodeProps) {
         word={currentWord}
       />
       <Form.Item label="Synonyms">
-        {synonymsNode}
+        <SynonymsDisplay belongWord={belongWord}>
+          {synonymsChildren}
+        </SynonymsDisplay>
       </Form.Item>
     </>
   );

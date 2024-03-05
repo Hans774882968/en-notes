@@ -4,7 +4,6 @@ import { GetWordListParams, GetWordListResp } from '@/lib/backend/paramAndResp';
 import { WORD_COMPLEXITY_INTRO } from '@/lib/frontend/const';
 import { Word } from '@/db/models/types';
 import { apiUrls } from '@/lib/backend/urls';
-import { removeFalsyAttrs } from '@/lib/utils';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import ComplexityTooltip from '@/components/list/ComplexityTooltip';
@@ -90,12 +89,12 @@ export default function List() {
     {
       key: 'word',
       label: 'Word',
-      slot: <Input allowClear />
+      slot: <Input placeholder="Please search" allowClear />
     },
     {
       key: 'note',
       label: 'Note',
-      slot: <Input allowClear />
+      slot: <Input placeholder="Please search" allowClear />
     },
     {
       key: 'ctime',
@@ -109,10 +108,11 @@ export default function List() {
     }
   ];
 
+  // 这里不能调 removeFalsyAttrs 否则在清掉某个原来值为空字符串的字段后，覆盖不掉原来的值，会造成 bug 。要根本上解决这个问题必须把 beforeSearch 调用时机延后
   const beforeSearch = (params: BeforeGetWordListParams) => {
     params.ctime = params.ctime?.map((item) => typeof item === 'string' ? item : item.format('YYYY-MM-DD 00:00:00'));
     params.mtime = params.mtime?.map((item) => typeof item === 'string' ? item : item.format('YYYY-MM-DD 00:00:00'));
-    removeFalsyAttrs(params);
+    return params;
   };
 
   const getWordList = async (params: GetWordListParams) => {

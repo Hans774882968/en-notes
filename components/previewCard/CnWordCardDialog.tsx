@@ -1,10 +1,10 @@
 import { CnWord } from '@/db/models/types';
 import { ModalProps } from 'antd/lib/modal';
+import { RefObject } from 'react';
 import { useCardThemeContext } from '../common/contexts/CardThemeContext';
-import { useRef, useState } from 'react';
 import CardDialog from './CardDialog';
 import CnWordPreviewCard from './CnWordPreviewCard';
-import saveAsImage from './saveAsImage';
+import Watermark from 'antd/lib/watermark';
 import useGetCnWord from '@/lib/frontend/hooks/api/useGetCnWord';
 
 interface Props {
@@ -25,12 +25,22 @@ export default function CnWordCardDialog({ word, open, onCancel, externalData }:
     params: { word }
   });
 
-  const previewCardRef = useRef<HTMLDivElement>(null);
-
-  const [isSaving, setIsSaving] = useState(false);
-
-  const onSaveBtnClick = () => {
-    saveAsImage({ previewCardRef, setIsSaving });
+  const getCnWordPreviewCard = (previewCardRef: RefObject<HTMLDivElement>, watermarkText: string | string[]) => {
+    const cardProps = {
+      cardTheme,
+      note: cnWordRecord?.note || '',
+      title: word
+    };
+    if (!watermarkText) {
+      return <CnWordPreviewCard ref={previewCardRef} {...cardProps} />;
+    }
+    return (
+      <div ref={previewCardRef}>
+        <Watermark content={watermarkText}>
+          <CnWordPreviewCard {...cardProps} />
+        </Watermark>
+      </div>
+    );
   };
 
   return (
@@ -39,19 +49,7 @@ export default function CnWordCardDialog({ word, open, onCancel, externalData }:
       open={open}
       onCancel={onCancel}
       data={cnWordRecord}
-      isSaving={isSaving}
-      onSaveBtnClick={onSaveBtnClick}
-    >
-      {
-        cnWordRecord && (
-          <CnWordPreviewCard
-            ref={previewCardRef}
-            title={word}
-            note={cnWordRecord.note}
-            cardTheme={cardTheme}
-          />
-        )
-      }
-    </CardDialog>
+      getChildren={getCnWordPreviewCard}
+    />
   );
 }

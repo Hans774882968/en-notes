@@ -1,27 +1,31 @@
-import { GetCnWordListParams } from '@/lib/backend/paramAndResp';
+import { GetSentenceListParams } from '@/lib/backend/paramAndResp';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Op } from 'sequelize';
 import { Resp, suc } from '@/lib/resp';
-import { calcCnWordComplexity } from '@/db/modelComplexity';
-import { cnWord } from '@/db/models';
+import { calcSentenceComplexity } from '@/db/modelComplexity';
 import { createRouter } from 'next-connect';
 import { removeFalsyAttrs } from '@/lib/utils';
+import { sentence, word } from '@/db/models';
+import { sentenceIdValidatorSchema } from '@/lib/backend/paramValidators';
 import { validateReq } from '@/middlewares/validateReq';
 
 const router = createRouter<NextApiRequest, NextApiResponse<Resp>>();
 
-// TODO: use ES
 router.post(
-  validateReq<GetCnWordListParams> ({
+  validateReq<GetSentenceListParams> ({
+    keywordObjects: [
+      sentenceIdValidatorSchema
+    ],
     schema: {
       additionalProperties: false,
       properties: {
         ctime: { items: { type: 'string' }, maxItems: 2, minItems: 2, nullable: true, type: 'array' },
+        id: { nullable: true, sentenceIdLegal: null, type: ['number', 'string'] },
         mtime: { items: { type: 'string' }, maxItems: 2, minItems: 2, nullable: true, type: 'array' },
         note: { nullable: true, type: 'string' },
         pageNum: { type: 'number' },
         pageSize: { type: 'number' },
-        word: { nullable: true, type: 'string' }
+        sentence: { nullable: true, type: 'string' }
       },
       required: ['pageNum', 'pageSize'],
       type: 'object'
@@ -34,24 +38,27 @@ router.post(
       note,
       pageNum,
       pageSize,
-      word: wordKey
+      id: sentenceId,
+      sentence: sentenceText
     } = req.body;
     const queryConditionObj = removeFalsyAttrs({
       ctime: ctime ? {
         [Op.between]: ctime.map((item: string) => new Date(item))
       } : null,
+      id: sentenceId ? sentenceId : null,
       mtime: mtime ? {
         [Op.between]: mtime.map((item: string) => new Date(item))
       } : null,
       note: note ? {
         [Op.substring]: note
       } : null,
-      word: wordKey ? {
-        [Op.substring]: wordKey
+      sentence: sentenceText ? {
+        [Op.substring]: sentenceText
       } : null
     });
-    const queryRes = await cnWord.findAndCountAll({
+    const queryRes = await sentence.findAndCountAll({
       distinct: true,
+      include: [word],
       limit: pageSize,
       offset: (pageNum - 1) * pageSize,
       where: {
@@ -59,15 +66,16 @@ router.post(
       }
     });
     const rows = queryRes.rows.map((item) => {
-      const complexity = calcCnWordComplexity(item);
+      const complexity = calcSentenceComplexity(item);
 
       return {
         complexity,
         ctime: item.getDataValue('ctime'),
+        id: item.getDataValue('id'),
         mtime: item.getDataValue('mtime'),
         note: item.getDataValue('note'),
-        sentences: item.getDataValue('sentences'),
-        word: item.getDataValue('word')
+        sentence: item.getDataValue('sentence'),
+        words: item.getDataValue('words')
       };
     });
     res.status(200).json(suc({

@@ -1,0 +1,17 @@
+@import '../../styles/linkColorMixin.scss';
+
+.noRecordContainer {
+  display: flex;
+  gap: 16px;
+
+  @include linkColor();
+}
+
+.hasRecordContainer {
+  .linkBox {
+    $antd-btn-padding-top: 4px;
+    $antd-btn-padding-left: 15px;
+    padding: $antd-btn-padding-top 0 0 $antd-btn-padding-left;
+    @include linkColor();
+  }
+}

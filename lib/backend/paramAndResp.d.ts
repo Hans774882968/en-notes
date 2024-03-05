@@ -126,6 +126,20 @@ export type GetSentenceResp = {
   sentence: Sentence | null
 };
 
+export type GetSentenceListParams = TableParams<{
+  id?: SentenceIdType
+  sentence?: string
+  note?: string
+  ctime?: string[]
+  mtime?: string[]
+}>;
+
+export type SentenceTableItem = Sentence & {
+  complexity: number
+};
+
+export type GetSentenceListResp = TableResp<SentenceTableItem>;
+
 export type CreateSentenceResp = {
   sentence: Sentence
 };

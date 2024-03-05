@@ -1,10 +1,10 @@
 import { ModalProps } from 'antd/lib/modal';
+import { RefObject } from 'react';
 import { Word } from '@/db/models/types';
 import { useCardThemeContext } from '../common/contexts/CardThemeContext';
-import { useRef, useState } from 'react';
 import CardDialog from './CardDialog';
+import Watermark from 'antd/lib/watermark';
 import WordPreviewCard from './WordPreviewCard';
-import saveAsImage from './saveAsImage';
 import useGetWord from '@/lib/frontend/hooks/api/useGetWord';
 
 interface Props {
@@ -25,12 +25,21 @@ export default function WordCardDialog({ word, open, onCancel, externalData }: P
     params: { word }
   });
 
-  const previewCardRef = useRef<HTMLDivElement>(null);
-
-  const [isSaving, setIsSaving] = useState(false);
-
-  const onSaveBtnClick = () => {
-    saveAsImage({ previewCardRef, setIsSaving });
+  const getWordPreviewCard = (previewCardRef: RefObject<HTMLDivElement>, watermarkText: string | string[]) => {
+    const cardProps = {
+      cardTheme,
+      word: wordRecord
+    };
+    if (!watermarkText) {
+      return <WordPreviewCard ref={previewCardRef} {...cardProps} />;
+    }
+    return (
+      <div ref={previewCardRef}>
+        <Watermark content={watermarkText}>
+          <WordPreviewCard {...cardProps} />
+        </Watermark>
+      </div>
+    );
   };
 
   return (
@@ -39,19 +48,7 @@ export default function WordCardDialog({ word, open, onCancel, externalData }: P
       open={open}
       onCancel={onCancel}
       data={wordRecord}
-      isSaving={isSaving}
-      onSaveBtnClick={onSaveBtnClick}
-    >
-      {
-        wordRecord && (
-          <WordPreviewCard
-            ref={previewCardRef}
-            word={word}
-            note={wordRecord.note}
-            cardTheme={cardTheme}
-          />
-        )
-      }
-    </CardDialog>
+      getChildren={getWordPreviewCard}
+    />
   );
 }

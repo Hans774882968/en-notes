@@ -1,0 +1,11 @@
+@import '../../styles/linkColorMixin.scss';
+
+.ol {
+  padding-left: 16px;
+
+  .linkLike {
+    cursor: pointer;
+
+    @include linkColorStyles();
+  }
+}

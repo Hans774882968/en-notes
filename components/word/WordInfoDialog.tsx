@@ -6,8 +6,8 @@ import Form from 'antd/lib/form';
 import LoadingInContainer from '../common/LoadingInContainer';
 import MarkdownPreviewer from '../MarkdownPreviewer';
 import Modal, { ModalProps } from 'antd/lib/modal';
-import NoSynonymsRecorded from './NoSynonymsRecorded';
 import SentencesItem from './SentencesItem';
+import SynonymsDisplay from './SynonymsDisplay';
 import useGetWord from '@/lib/frontend/hooks/api/useGetWord';
 
 /**
@@ -41,11 +41,11 @@ export default function WordInfoDialog({ word, open, onCancel, externalData }: P
     setIsNextModalOpen(false);
   };
 
-  const synonymsNode = wordRecord?.itsSynonyms.length ? (
+  const synonymsChildren = wordRecord?.itsSynonyms.length ? (
     wordRecord?.itsSynonyms.map(({ word }) => (
       <Button key={word} type="link" onClick={() => openNextDialog(word)}>{word}</Button>
     ))
-  ) : <NoSynonymsRecorded belongWord={word} />;
+  ) : null;
 
   return (
     <>
@@ -69,7 +69,9 @@ export default function WordInfoDialog({ word, open, onCancel, externalData }: P
           !wordRecord ? <LoadingInContainer /> : (
             <Form {...formLayout}>
               <Form.Item label="Synonyms">
-                {synonymsNode}
+                <SynonymsDisplay belongWord={word}>
+                  {synonymsChildren}
+                </SynonymsDisplay>
               </Form.Item>
               <SentencesItem belongWord={word} sentences={wordRecord.sentences} />
               <Form.Item label="Create Time">

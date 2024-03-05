@@ -1,5 +1,5 @@
 import { CardThemeClassNames, LightThemeClassNames } from '../common/contexts/CardThemeContext';
-import { Word } from '@/db/models/types';
+import { Sentence } from '@/db/models/types';
 import { forwardRef } from 'react';
 import { isNonEmptyArray } from '@/lib/utils';
 import Button from 'antd/lib/button';
@@ -14,21 +14,21 @@ const MarkdownPreview = dynamic(
 );
 
 interface Props {
-  word?: Word | null
+  sentence?: Sentence | null
   cardTheme: CardThemeClassNames
 }
 
 type PartProps = Props;
 
-function SynonymsPart({ word, cardTheme }: PartProps) {
-  const synonyms = word?.itsSynonyms;
-  if (!isNonEmptyArray(synonyms)) return null;
+function RelevantWordsPart({ sentence, cardTheme }: PartProps) {
+  const words = sentence?.words;
+  if (!isNonEmptyArray(words)) return null;
   return (
     <>
-      <h2 className={`${styles.title} ${styles[cardTheme]}`}>Synonyms</h2>
+      <h2 className={`${styles.title} ${styles[cardTheme]}`}>Relevant Words</h2>
       <div className={`${styles.words} ${styles[cardTheme]}`}>
         {
-          synonyms.map(({ word }) => (
+          words.map(({ word }) => (
             <Button key={word} className={styles.linkBtn} type="link">{word}</Button>
           ))
         }
@@ -37,25 +37,8 @@ function SynonymsPart({ word, cardTheme }: PartProps) {
   );
 }
 
-function SentencePart({ word, cardTheme }: PartProps) {
-  const sentences = word?.sentences;
-  if (!isNonEmptyArray(sentences)) return null;
-  return (
-    <>
-      <h2 className={`${styles.title} ${styles[cardTheme]}`}>Sentences</h2>
-      <ol className={`${styles.sentences} ${styles[cardTheme]}`}>
-        {
-          word?.sentences.map(({ id, sentence }) => {
-            return (<li key={id}><span className={styles.linkLike}>{sentence}</span></li>);
-          })
-        }
-      </ol>
-    </>
-  );
-}
-
-function NotePart({ word, cardTheme }: PartProps) {
-  const shouldShowTitle = isNonEmptyArray(word?.itsSynonyms) || isNonEmptyArray(word?.sentences);
+function NotePart({ sentence, cardTheme }: PartProps) {
+  const shouldShowTitle = isNonEmptyArray(sentence?.words);
 
   return (
     <>
@@ -66,16 +49,16 @@ function NotePart({ word, cardTheme }: PartProps) {
       }
       <MarkdownPreview
         className={`${styles.markdownPreview} ${styles[cardTheme]}`}
-        source={word?.note || ''}
+        source={sentence?.note || ''}
         rehypePlugins={[rehypeSanitize]}
       />
     </>
   );
 }
 
-const WordPreviewCard = forwardRef<HTMLDivElement, Props>(
+const SentencePreviewCard = forwardRef<HTMLDivElement, Props>(
   (props, ref) => {
-    const { word, cardTheme } = props;
+    const { sentence, cardTheme } = props;
     return (
       <div
         ref={ref}
@@ -87,9 +70,8 @@ const WordPreviewCard = forwardRef<HTMLDivElement, Props>(
           )
         }
         <div className={`${styles.inner} ${styles[cardTheme]}`}>
-          <h1 className={`${styles.title} ${styles[cardTheme]}`}>{word?.word || ''}</h1>
-          <SynonymsPart {...props} />
-          <SentencePart {...props} />
+          <h1 className={`${styles.title} ${styles[cardTheme]}`}>{sentence?.sentence || ''}</h1>
+          <RelevantWordsPart {...props} />
           <NotePart {...props} />
         </div>
       </div>
@@ -97,6 +79,6 @@ const WordPreviewCard = forwardRef<HTMLDivElement, Props>(
   }
 );
 
-WordPreviewCard.displayName = 'WordPreviewCard';
+SentencePreviewCard.displayName = 'SentencePreviewCard';
 
-export default WordPreviewCard;
+export default SentencePreviewCard;

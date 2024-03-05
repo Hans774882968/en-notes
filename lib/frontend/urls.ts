@@ -11,7 +11,8 @@ export const urls = {
   },
   sentence: {
     create: '/sentence/create',
-    edit: '/sentence/edit'
+    edit: '/sentence/edit',
+    list: '/sentence/list'
   },
   word: {
     edit: '/word/word',

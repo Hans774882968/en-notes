@@ -14,7 +14,7 @@ export interface SearchProps {
   config: SearchFieldProps[]
   searchOnReset?: boolean
   handleSearch: (arg0: object) => void
-  beforeSearch?: (arg0: object) => void
+  beforeSearch?: (arg0: object) => object
   onFieldsChange?: (arg0?: unknown, arg1?: unknown) => void
 }
 
@@ -52,8 +52,10 @@ const SearchForm = forwardRef<SearchFormRef, SearchProps>(
     };
 
     const emitSearch = (values: object): void => {
-      // beforeSearch用于处理一些特殊情况
-      beforeSearch && beforeSearch(values);
+      // beforeSearch 用于处理一些特殊情况
+      if (beforeSearch) {
+        values = beforeSearch(values);
+      }
       handleSearch(values);
     };
 
@@ -108,7 +110,6 @@ const SearchForm = forwardRef<SearchFormRef, SearchProps>(
 SearchForm.displayName = 'SearchForm';
 
 SearchForm.defaultProps = {
-  beforeSearch: () => {},
   onFieldsChange: () => {}
 };
 

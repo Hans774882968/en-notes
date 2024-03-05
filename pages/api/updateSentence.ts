@@ -41,7 +41,7 @@ router.post(
           note,
           sentence: sentenceData
         },
-        { where: { id }}
+        { where: { id } }
       );
       res.status(200).json(suc({
         affectedCount,

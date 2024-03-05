@@ -44,13 +44,13 @@
       color: getThemeVar('textColor')
     }
 
-    .linkSvg {
+    .linkIcon {
       margin-left: 6px;
     }
 
     &:hover {
       @include useTheme {
-        color: getThemeVar('navbarLinkColor')
+        color: getThemeVar('navbarLinkHoverColor')
       }
     }
   }

@@ -1,6 +1,6 @@
 import { CommonObjectType } from '@/typings/global';
 import { TableResp } from '@/lib/table';
-import { isNonEmptyArray } from '@/lib/utils';
+import { isNonEmptyArray, removeFalsyAttrs } from '@/lib/utils';
 import React, {
   CSSProperties,
   ReactNode,
@@ -15,6 +15,7 @@ import useSWR from 'swr';
 
 /**
  * reference https://github.com/hsl947/react-antd-multi-tabs-admin
+ * 只能说我眼光不太好，这个组件原有代码质量太低了…改起来难受
  * 1. 原来项目的代码使用了自定义的 RefType ，存在兼容性问题。我参考下面的文档把TS类型安全问题解决掉了
  * https://geek-docs.com/typescript/typescript-questions/516_typescript_declare_type_with_reactuseimperativehandle.html
  * 2. 用 swr 代替原作者自制的 useService 轮子。
@@ -62,6 +63,12 @@ const useService = (
 };
 */
 
+interface TableParams {
+  pageNum: number
+  pageSize: number
+  [key: string]: unknown
+}
+
 export interface TableRef {
   getTableData: () => CommonObjectType[]
   resetField: (field?: string[]) => void
@@ -74,6 +81,8 @@ export interface TableRef {
  * @param {React.ForwardedRef<TableRef>} ref 表格的实例，用于调用内部方法
  * @param {object[]} columns 表格列的配置
  * @param {function} apiFun 表格数据的请求方法
+ * @param {string} requestKey 请求接口传入 useSWR 的 key ，要求每个组件唯一。比如，可以考虑传入接口 url
+ * @param {boolean} removeFalsyParamsOnSearch 发起搜索请求（apiFun）前是否把值为 falsy 的参数去掉（在 beforeSearch 调用后）
  * @param {SearchProps['config']} searchConfigList 搜索栏配置
  * @param {function} beforeSearch 搜索前的操作（如处理一些特殊数据，修改搜索参数）
  * @param {function} onFieldsChange 处理搜索栏表单联动事件
@@ -93,6 +102,7 @@ interface TableProps {
   columns: object[]
   apiFun: (arg0: any) => Promise<TableResp<CommonObjectType>>
   requestKey: string
+  removeFalsyParamsOnSearch?: boolean
   searchConfigList?: SearchProps['config']
   extraProps?: object
   rowKey?: string
@@ -100,7 +110,7 @@ interface TableProps {
   small?: boolean
   showHeader?: boolean
   paginationOptions?: string[]
-  beforeSearch?: (arg0?: any) => void
+  beforeSearch?: (arg0?: any) => any
   onSelectRow?: (arg0?: string[], arg1?: string[]) => void
   onFieldsChange?: (arg0?: unknown, arg1?: unknown) => void
   sortConfig?: (arg0?: object) => any
@@ -109,6 +119,7 @@ interface TableProps {
   style?: CSSProperties
 }
 
+// TODO: 有一个诡异的 bug，打开控制台窗口（disable cache未勾选），点击第二页，会发两条请求，其中后一条请求状态码200但没有返回数据，导致列表不展示。关闭控制台窗口则没有这个bug
 const EnNotesTable = forwardRef<TableRef, TableProps>(
   (props, ref) => {
     /**
@@ -121,6 +132,7 @@ const EnNotesTable = forwardRef<TableRef, TableProps>(
       columns,
       apiFun,
       requestKey,
+      removeFalsyParamsOnSearch,
       searchConfigList,
       extraProps,
       rowKey,
@@ -160,7 +172,7 @@ const EnNotesTable = forwardRef<TableRef, TableProps>(
     // 多选框的选择值
     const [selectedKeys, setSelectedKeys] = useState<any[]>([]);
     // 列表所有的筛选参数（包括搜索、分页、排序等）
-    const [tableParams, setTableParams] = useState(initParams);
+    const [tableParams, setTableParams] = useState<TableParams>(initParams);
     // 列表搜索参数
     const [searchParams, setSearchParams] = useState(searchObj);
     // 列表排序参数
@@ -174,10 +186,18 @@ const EnNotesTable = forwardRef<TableRef, TableProps>(
     const { isLoading: loading, data: response } = useSWR([tableParams, requestKey], ([tableParams]) => apiFun(tableParams));
     const { rows: tableData = [], total = -1 } = response || {};
 
+    // 顾名思义，不要直接调用 setTableParams ，而是调下面这个方法。可以理解为 setTableParams 的增强
+    const tableParamsOnlySetter = (newTableParams: TableParams) => {
+      const resultTableParams = removeFalsyParamsOnSearch ? removeFalsyAttrs(newTableParams) as TableParams : newTableParams;
+      setTableParams(resultTableParams);
+    };
+
     // 执行搜索操作
+    // 目前顺序是 beforeSearch -> { ...tableParams, ...val, pageNum: 1 } -> optional removeFalsyAttrs -> setTableParams
+    // TODO: 顺序应该改成 { ...tableParams, ...val, pageNum: 1 } -> optional removeFalsyAttrs -> beforeSearch -> setTableParams 。现在先凑合着用吧
     const handleSearch = (val: object): void => {
       setSearchParams(val);
-      setTableParams({ ...tableParams, ...val, pageNum: 1 });
+      tableParamsOnlySetter({ ...tableParams, ...val, pageNum: 1 });
     };
 
     // 重置列表部分状态
@@ -186,7 +206,7 @@ const EnNotesTable = forwardRef<TableRef, TableProps>(
       const nextPage = page || curPageNo;
       const nextParams = page === 1 ? {} : { ...searchParams, ...sortParams };
       setCurPageNo(nextPage);
-      setTableParams({
+      tableParamsOnlySetter({
         ...initParams,
         ...nextParams,
         pageNum: nextPage,
@@ -236,7 +256,7 @@ const EnNotesTable = forwardRef<TableRef, TableProps>(
       const { current: pageNum, pageSize } = pagination;
       setCurPageNo(pageNum);
       setCurPageSize(pageSize);
-      setTableParams({
+      tableParamsOnlySetter({
         ...initParams,
         ...searchParams,
         ...sortObj,
@@ -314,13 +334,13 @@ const EnNotesTable = forwardRef<TableRef, TableProps>(
 );
 
 EnNotesTable.defaultProps = {
-  beforeSearch: () => {},
   expandedRowRender: undefined,
   extraProps: {},
   onExpand: () => {},
   onFieldsChange: () => {},
   onSelectRow: undefined,
   paginationOptions: [],
+  removeFalsyParamsOnSearch: true,
   rowClassName: '',
   rowKey: 'id',
   searchConfigList: [],

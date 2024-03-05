@@ -3,8 +3,14 @@
   flex-direction: column;
   gap: 16px;
 
-  .toolbar {
+  .toolbars {
     display: flex;
+    flex-direction: column;
     gap: 16px;
+
+    .toolbar {
+      display: flex;
+      gap: 16px;
+    }
   }
 }

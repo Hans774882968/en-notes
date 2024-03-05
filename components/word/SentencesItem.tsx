@@ -1,9 +1,9 @@
 import { Sentence, SentenceIdType } from '@/db/models/types';
 import { useState } from 'react';
-import Button from 'antd/lib/button';
 import Form from 'antd/lib/form';
-import NoSentencesRecorded from './NoSentencesRecorded';
 import SentenceInfoDialog from './SentenceInfoDialog';
+import SentencesDisplay from './SentencesDisplay';
+import styles from './SentencesItem.module.scss';
 
 interface Props {
   sentences: Sentence[]
@@ -25,6 +25,22 @@ export default function SentencesItem({ belongWord, sentences }: Props) {
     setIsModalOpen(false);
   };
 
+  const sentencesChildren = !sentences.length ? null : (
+    <ol className={styles.ol}>
+      {
+        sentences.map(({ id: sentenceId, sentence }) => {
+          return (
+            <li key={sentenceId}>
+              <span className={styles.linkLike} onClick={() => openDialog(sentenceId, sentence)}>
+                {sentence}
+              </span>
+            </li>
+          );
+        })
+      }
+    </ol>
+  );
+
   return (
     <>
       <SentenceInfoDialog
@@ -34,25 +50,9 @@ export default function SentencesItem({ belongWord, sentences }: Props) {
         sentenceId={currentSentenceId}
       />
       <Form.Item label="Sentences">
-        {
-          !sentences.length ? <NoSentencesRecorded belongWord={belongWord} /> : (
-            <ol>
-              {
-                sentences.map(({ id: sentenceId, sentence }) => {
-                  return (
-                    <Button
-                      key={sentenceId}
-                      type="link"
-                      onClick={() => openDialog(sentenceId, sentence)}
-                    >
-                      {sentence}
-                    </Button>
-                  );
-                })
-              }
-            </ol>
-          )
-        }
+        <SentencesDisplay belongWord={belongWord}>
+          {sentencesChildren}
+        </SentencesDisplay>
       </Form.Item>
     </>
   );

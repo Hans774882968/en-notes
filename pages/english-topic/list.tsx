@@ -4,7 +4,6 @@ import { CnWord } from '@/db/models/types';
 import { Dayjs } from 'dayjs';
 import { GetCnWordListParams, GetCnWordListResp } from '@/lib/backend/paramAndResp';
 import { apiUrls } from '@/lib/backend/urls';
-import { removeFalsyAttrs } from '@/lib/utils';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import CnWordCardDialog from '@/components/previewCard/CnWordCardDialog';
@@ -25,7 +24,7 @@ type BeforeGetCnWordListParams = Omit<GetCnWordListParams, 'ctime' | 'mtime'> & 
 }
 
 export default function List() {
-  // 正常用户不会设法（可以做到）去同时开两个对话框，为了省事， currentWord 先共用了
+  // 正常用户不会设法（可以做到）去同时开两个对话框，为了省事， currentCnWord 先共用了
   const [currentCnWord, setCurrentCnWord] = useState('');
 
   const [isCnWordInfoDialogOpen, setIsCnWordInfoDialogOpen] = useState(false);
@@ -85,12 +84,12 @@ export default function List() {
     {
       key: 'word',
       label: 'Title',
-      slot: <Input allowClear />
+      slot: <Input placeholder="Please search" allowClear />
     },
     {
       key: 'note',
       label: 'Note',
-      slot: <Input allowClear />
+      slot: <Input placeholder="Please search" allowClear />
     },
     {
       key: 'ctime',
@@ -104,10 +103,11 @@ export default function List() {
     }
   ];
 
+  // 这里不能调 removeFalsyAttrs 否则在清掉某个原来值为空字符串的字段后，覆盖不掉原来的值，会造成 bug 。要根本上解决这个问题必须把 beforeSearch 调用时机延后
   const beforeSearch = (params: BeforeGetCnWordListParams) => {
     params.ctime = params.ctime?.map((item) => typeof item === 'string' ? item : item.format('YYYY-MM-DD 00:00:00'));
     params.mtime = params.mtime?.map((item) => typeof item === 'string' ? item : item.format('YYYY-MM-DD 00:00:00'));
-    removeFalsyAttrs(params);
+    return params;
   };
 
   const getCnWordList = async (params: GetCnWordListParams) => {

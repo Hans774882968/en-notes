@@ -1,0 +1,19 @@
+@import './theme.scss';
+
+@mixin linkColorStyles {
+  @include useTheme {
+    color: getThemeVar('linkColor')
+  }
+
+  &:hover {
+    @include useTheme {
+      color: getThemeVar('linkHoverColor')
+    }
+  }
+}
+
+@mixin linkColor {
+  .link {
+    @include linkColorStyles();
+  }
+}

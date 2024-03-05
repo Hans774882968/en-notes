@@ -1,0 +1,17 @@
+@import '../../styles/linkColorMixin.scss';
+
+.container {
+  display: flex;
+  gap: 16px;
+
+  .linkBox {
+    &.withRecord {
+      // 为了和 antd button 对齐
+      $antd-btn-padding-top: 4px;
+      padding: $antd-btn-padding-top 0;
+      border: 1px solid transparent;
+    }
+
+    @include linkColor();
+  }
+}

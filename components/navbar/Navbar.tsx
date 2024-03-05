@@ -1,8 +1,9 @@
 import Col from 'antd/lib/col';
+import GitHubOutlined from '@ant-design/icons/GithubOutlined';
 import Image from 'next/image';
 import Link from 'next/link';
 import LinkSvg from './LinkSvg';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Row from 'antd/lib/row';
 import ThemeBtn from './ThemeBtn';
 import icon48 from '@/assets/icon48.png';
@@ -10,10 +11,10 @@ import styles from './Navbar.module.scss';
 
 interface ExternalLinkProps {
   href: string
-  text: string
+  children?: ReactNode
 }
 
-function ExternalLink({ href, text }: ExternalLinkProps) {
+function ExternalLink({ href, children }: ExternalLinkProps) {
   return (
     <Link
       href={href}
@@ -21,7 +22,7 @@ function ExternalLink({ href, text }: ExternalLinkProps) {
       rel="noopener noreferrer"
       className={styles.link}
     >
-      {text}<LinkSvg className={styles.linkSvg} />
+      {children}
     </Link>
   );
 }
@@ -43,8 +44,15 @@ const Navbar: React.FC = () => {
         </Col>
 
         <Col offset={6} className={styles.navbarCol}>
-          <ExternalLink href="https://github.com/Hans774882968/en-notes" text="GitHub" />
-          <ExternalLink href="https://juejin.cn/user/1464964842528888" text="JueJin" />
+          <ExternalLink href="https://github.com/Hans774882968/en-notes">
+            GitHub<GitHubOutlined className={styles.linkIcon} />
+          </ExternalLink>
+          <ExternalLink href="https://juejin.cn/user/1464964842528888">
+            JueJin<LinkSvg className={styles.linkIcon} />
+          </ExternalLink>
+          <ExternalLink href="https://www.52pojie.cn/home.php?mod=space&uid=1906177">
+            52PoJie<LinkSvg className={styles.linkIcon} />
+          </ExternalLink>
         </Col>
       </Row>
     </header>

@@ -9,7 +9,7 @@ interface Props {
   setIsSaving?: Dispatch<SetStateAction<boolean>>
 }
 
-function download2png(canvas: HTMLCanvasElement) {
+function downloadAsPng(canvas: HTMLCanvasElement) {
   const tempDomNode = document.createElement('a');
   tempDomNode.href = canvas.toDataURL('image/png');
   tempDomNode.download = genFileNameAtFrontend() + '.png';
@@ -26,7 +26,7 @@ export default async function saveAsImage({
     const targetDiv = previewCardRef ? previewCardRef.current : previewCardDiv;
     if (!targetDiv) return;
     const canvas = await html2canvas(targetDiv);
-    download2png(canvas);
+    downloadAsPng(canvas);
   } catch (err) {
     errorGeneralHelper(err, 'html2canvas unknown error');
   } finally {

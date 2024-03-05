@@ -1,3 +1,5 @@
+@import '../../styles/linkColorMixin.scss';
+
 // reference https://github.com/nicejade/markdown2png/blob/master/src/views/Home.vue
 
 .container {
@@ -127,6 +129,21 @@
       &.yellow {
         color: #000;
         background-color: transparent;
+      }
+    }
+
+    .linkBtn {
+      font-size: 16px;
+    }
+
+    .sentences {
+      padding-left: 32px;
+      font-size: 16px;
+
+      .linkLike {
+        cursor: pointer;
+
+        @include linkColorStyles();
       }
     }
 
