@@ -97,6 +97,35 @@ describe('genFileNameAtFrontend', () => {
 });
 ```
 
+### favicon.ico和导航栏左上角图标
+
+我的导航栏左上角需要展示一个图标，它和favicon.ico一样，只有大小不同。所幸在[这里](https://www.iconfont.cn/search/index?searchType=icon&q=%E8%8B%B1%E8%AF%AD)很快就找到了。它要求登录才能下载，但实际上F12直接把svg复制下来，改改代码即可。
+
+```tsx
+import { SVGProps } from 'react';
+
+export default function EnglishSvg(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" {...props}>
+       <path fill="currentColor" d="..." />
+    </svg>
+  );
+}
+```
+
+导航栏组件调用：
+
+```tsx
+<div className={styles.navbarCol}>
+  <Link className={styles.appName} href="/">
+    <EnglishSvg width={48} height={48} />
+    <span>en-notes</span>
+  </Link>
+</div>
+```
+
+而favicon.ico可以由svg转化而来。[svg转ico（随便找的）](https://cdkm.com/cn/svg-to-ico)
+
 ### MarkdownEditor
 
 #### 字数、行数统计
@@ -158,6 +187,22 @@ if (value !== lastValue) {
 }
 ```
 
+### 用next-auth实现GitHub授权登录
+
+安装依赖：`npm install next-auth`。
+
+我们需要在`.env.local`填入：
+
+```yml
+AUTH_GITHUB_ID=<去GitHub拿>
+AUTH_GITHUB_SECRET=<去GitHub拿>
+AUTH_SECRET=<由npx auth secret命令生成>
+```
+
+前两者看[参考链接6](https://juejin.cn/post/7329736763060518931)去GitHub上操作即可。后者需要先运行`npx auth secret`命令，接着`npx`会提示你把`auth`这个包下载下来才能真正执行此命令。
+
+TODO
+
 ## 具体页面
 
 ### 单词、English Topic创建、编辑二合一页
@@ -185,3 +230,4 @@ function onClick() {
 3. https://zh-hans.react.dev/learn/you-might-not-need-an-effect
 4. next里使用Jest如何解决“不支持`es`模块的`npm`包”：https://github.com/vercel/next.js/discussions/34589
 5. Jest如何mock date：https://codewithhugo.com/mocking-the-current-date-in-jest-tests/
+6. 用`next-auth`实现GitHub授权登录：https://juejin.cn/post/7329736763060518931

@@ -1,5 +1,7 @@
+import { GetServerSideProps } from 'next';
 import { GetWordResp, UpsertWordResp, WordSearchResp } from '@/lib/backend/paramAndResp';
 import { Sentence, Word } from '@/db/models/types';
+import { UserSession, noEditPerm } from '@/lib/backend/noPermInterceptor';
 import { apiUrls } from '@/lib/backend/urls';
 import { useState } from 'react';
 import Form from 'antd/lib/form';
@@ -105,3 +107,7 @@ export default function WordPage() {
     />
   );
 }
+
+export const getServerSideProps: GetServerSideProps<UserSession> = (context) => {
+  return noEditPerm(context);
+};

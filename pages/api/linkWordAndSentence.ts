@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { enWordValidatorSchema, sentenceIdValidatorSchema } from '@/lib/backend/paramValidators';
 import { fail, suc } from '@/lib/resp';
+import { isAuthorized } from '@/middlewares/isAuthorized';
 import { sentence, word, wordSentence } from '@/db/models';
 import { validateReq } from '@/middlewares/validateReq';
 
@@ -25,6 +26,7 @@ router.post(
       type: 'object'
     }
   }),
+  isAuthorized(),
   async(req, res) => {
     let { sentenceId, word: wordData } = req.body;
     sentenceId = sentenceId.toString().trim();

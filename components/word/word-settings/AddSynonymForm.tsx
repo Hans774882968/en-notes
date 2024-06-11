@@ -91,7 +91,7 @@ export default function AddSynonymForm() {
     const params = { lhs: submitLhs, rhs: submitRhs };
     setIsSubmitting(true);
     try {
-      const { created } = await Request.post<AddWordSynonymResp>({ data: params, url: '/api/addWordSynonym' });
+      const { created } = await Request.post<AddWordSynonymResp>({ data: params, url: apiUrls.word.addSynonym });
       const msg = created ? 'Add synonym success' : 'This synonym pair has been previously added';
       Message.success({ content: msg });
     } catch (e) {

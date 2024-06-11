@@ -3,6 +3,7 @@ import { UPSERT_WORD_EXCEPTION } from '@/lib/retcode';
 import { UpsertWordParams } from '@/lib/backend/paramAndResp';
 import { createRouter } from 'next-connect';
 import { enWordValidatorSchema } from '@/lib/backend/paramValidators';
+import { isAuthorized } from '@/middlewares/isAuthorized';
 import { upsertWordRecord } from '@/lib/backend/apiUtils';
 import { validateReq } from '@/middlewares/validateReq';
 import { word } from '@/db/models';
@@ -24,6 +25,7 @@ router.post(
       type: 'object'
     }
   }),
+  isAuthorized(),
   async(req, res) => {
     upsertWordRecord({
       model: word,

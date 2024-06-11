@@ -3,6 +3,7 @@ import { UPSERT_CN_WORD_EXCEPTION } from '@/lib/retcode';
 import { UpsertCnWordParams } from '@/lib/backend/paramAndResp';
 import { cnWord } from '@/db/models';
 import { createRouter } from 'next-connect';
+import { isAuthorized } from '@/middlewares/isAuthorized';
 import { upsertWordRecord } from '@/lib/backend/apiUtils';
 import { validateReq } from '@/middlewares/validateReq';
 
@@ -29,6 +30,7 @@ router.post(
       type: 'object'
     }
   }),
+  isAuthorized(),
   async(req, res) => {
     upsertWordRecord({
       model: cnWord,

@@ -1,12 +1,12 @@
 import Col from 'antd/lib/col';
+import EnglishSvg from './EnglishSvg';
 import GitHubOutlined from '@ant-design/icons/GithubOutlined';
-import Image from 'next/image';
 import Link from 'next/link';
 import LinkSvg from './LinkSvg';
+import LoginInfo from './loginInfo/LoginInfo';
 import React, { ReactNode } from 'react';
 import Row from 'antd/lib/row';
 import ThemeBtn from './ThemeBtn';
-import icon48 from '@/assets/icon48.png';
 import styles from './Navbar.module.scss';
 
 interface ExternalLinkProps {
@@ -34,13 +34,16 @@ const Navbar: React.FC = () => {
         <Col span={6}>
           {/* 多套一层div，修复 flex-gap-polyfill 导致同一行右侧的元素产生偏移的bug */}
           <div className={styles.navbarCol}>
-            <Image src={icon48} alt="icon48.png" priority />
-            <Link className={styles.appName} href="/">en-notes</Link>
+            <Link className={styles.appName} href="/">
+              <EnglishSvg width={48} height={48} />
+              <span>en-notes</span>
+            </Link>
           </div>
         </Col>
 
         <Col span={6} className={styles.navbarCol}>
           <ThemeBtn />
+          <LoginInfo />
         </Col>
 
         <Col offset={6} className={styles.navbarCol}>

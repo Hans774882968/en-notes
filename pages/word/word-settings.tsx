@@ -1,3 +1,5 @@
+import { GetServerSideProps } from 'next';
+import { UserSession, noEditPerm } from '@/lib/backend/noPermInterceptor';
 import EnLayout from '@/components/EnLayout';
 import FormSkeleton from '@/components/word/word-settings/FormSkeleton';
 import dynamic from 'next/dynamic';
@@ -22,3 +24,7 @@ export default function WordSettings() {
     </EnLayout>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<UserSession> = (context) => {
+  return noEditPerm(context);
+};

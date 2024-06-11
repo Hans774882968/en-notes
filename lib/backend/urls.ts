@@ -19,8 +19,10 @@ export const apiUrls = {
     search: '/api/sentence/search'
   },
   word: {
+    addSynonym: '/api/addWordSynonym',
     edit: '/api/upsertWord',
     get: '/api/getWord',
+    linkWordAndSentence: '/api/linkWordAndSentence',
     list: '/api/word/list',
     search: '/api/word/search'
   }

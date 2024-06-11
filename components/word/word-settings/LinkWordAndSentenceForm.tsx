@@ -95,7 +95,7 @@ export default function LinkWordAndSentenceForm() {
     const params = { sentenceId, word: submitWord };
     setIsSubmitting(true);
     try {
-      const { created } = await Request.post<LinkWordAndSentenceResp>({ data: params, url: '/api/linkWordAndSentence' });
+      const { created } = await Request.post<LinkWordAndSentenceResp>({ data: params, url: apiUrls.word.linkWordAndSentence });
       const msg = created ? 'Link success' : 'This word and sentence has been previously linked';
       Message.success({ content: msg });
     } catch (e) {

@@ -4,11 +4,13 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { enWordValidatorSchema } from '@/lib/backend/paramValidators';
 import { fail, suc } from '@/lib/resp';
+import { isAuthorized } from '@/middlewares/isAuthorized';
 import { synonym, word } from '@/db/models';
 import { validateReq } from '@/middlewares/validateReq';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
+// TODO: 有一个bug：假设有两个连通块 1-2 3-4 ，请求是1连3，那么目前的代码连接了1-3,4和3-1,2，漏了2-4
 router.post(
   validateReq<AddWordSynonymParams> ({
     keywordObjects: [
@@ -24,6 +26,7 @@ router.post(
       type: 'object'
     }
   }),
+  isAuthorized(),
   async(req, res) => {
     let { lhs, rhs } = req.body;
     lhs = lhs.trim().toLowerCase();

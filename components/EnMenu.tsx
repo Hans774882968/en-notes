@@ -1,6 +1,8 @@
 import { Key, ReactNode, useState } from 'react';
+import { MenuItemData, collectAllKeys, getFilteredItems } from '@/lib/frontend/enMenuHelper';
 import { urls } from '@/lib/frontend/urls';
 import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 import AppstoreOutlined from '@ant-design/icons/AppstoreOutlined';
 import DashboardOutlined from '@ant-design/icons/DashboardOutlined';
 import EditOutlined from '@ant-design/icons/EditOutlined';
@@ -9,56 +11,51 @@ import Menu, { MenuProps } from 'antd/lib/menu';
 import SettingOutlined from '@ant-design/icons/SettingOutlined';
 import TableOutlined from '@ant-design/icons/TableOutlined';
 
-type MenuItem = Required<MenuProps>['items'][number];
-
 function getItem(
   label: ReactNode,
   key: Key,
+  requireAuthorized: boolean,
   icon?: ReactNode,
-  children?: MenuItem[],
+  children?: MenuItemData[],
   type?: 'group'
-): MenuItem {
+): MenuItemData {
   return {
     children,
     icon,
     key,
     label,
+    requireAuthorized,
     type
-  } as MenuItem;
+  } as MenuItemData;
 }
 
-const items: MenuProps['items'] = [
-  getItem('Word', '1-1', <AppstoreOutlined />, [
-    getItem('Edit', urls.word.edit, <EditOutlined />),
-    getItem('List', urls.word.list, <TableOutlined />),
-    getItem('Word Settings', urls.word.settings, <SettingOutlined />)
+const items: MenuItemData[] = [
+  getItem('Word', '1-1', false, <AppstoreOutlined />, [
+    getItem('Create & Edit', urls.word.edit, true, <EditOutlined />),
+    getItem('List', urls.word.list, false, <TableOutlined />),
+    getItem('Word Settings', urls.word.settings, true, <SettingOutlined />)
   ]),
-  getItem('English Topic', '1-2', <AppstoreOutlined />, [
-    getItem('Edit', urls.cnWord.edit, <EditOutlined />),
-    getItem('List', urls.cnWord.list, <TableOutlined />)
+  getItem('English Topic', '1-2', false, <AppstoreOutlined />, [
+    getItem('Create & Edit', urls.cnWord.edit, true, <EditOutlined />),
+    getItem('List', urls.cnWord.list, false, <TableOutlined />)
   ]),
-  getItem('Sentence', '1-3', <AppstoreOutlined />, [
-    getItem('Create', urls.sentence.create, <EditOutlined />),
-    getItem('Edit', urls.sentence.edit, <EditOutlined />),
-    getItem('List', urls.sentence.list, <TableOutlined />)
+  getItem('Sentence', '1-3', false, <AppstoreOutlined />, [
+    getItem('Create', urls.sentence.create, true, <EditOutlined />),
+    getItem('Edit', urls.sentence.edit, true, <EditOutlined />),
+    getItem('List', urls.sentence.list, false, <TableOutlined />)
   ]),
-  getItem('Export', urls.export.index, <ExportOutlined />),
-  getItem('Dashboard', urls.dashboard.index, <DashboardOutlined />)
+  getItem('Export', urls.export.index, false, <ExportOutlined />),
+  getItem('Dashboard', urls.dashboard.index, false, <DashboardOutlined />)
 ];
-
-function collectAllKeys(currentItems: MenuProps['items'], a: string[]) {
-  currentItems?.forEach((currentItem) => {
-    if (currentItem?.key) a.push(currentItem.key.toString());
-    if (currentItem && 'children' in currentItem) collectAllKeys(currentItem.children, a);
-  });
-  return a;
-}
-
-const allKeys = collectAllKeys(items, []);
 
 export default function EnMenu() {
   const router = useRouter();
   const defaultSelectedKeys = [router.pathname];
+
+  const { data: session } = useSession();
+  const filteredItems = getFilteredItems(items, session);
+  const allKeys = collectAllKeys(filteredItems, []);
+
   const [openSubmenus, setOpenSubMenus] = useState<string[]>(allKeys);
 
   const onMenuClick: MenuProps['onClick'] = (e) => {
@@ -76,7 +73,7 @@ export default function EnMenu() {
       openKeys={openSubmenus}
       onOpenChange={setOpenSubMenus}
       mode="inline"
-      items={items}
+      items={filteredItems}
     />
   );
 }

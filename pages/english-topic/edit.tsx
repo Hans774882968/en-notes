@@ -1,5 +1,7 @@
 import { CnWord } from '@/db/models/types';
 import { CnWordSearchResp, GetCnWordResp, UpsertCnWordResp } from '@/lib/backend/paramAndResp';
+import { GetServerSideProps } from 'next';
+import { UserSession, noEditPerm } from '@/lib/backend/noPermInterceptor';
 import { apiUrls } from '@/lib/backend/urls';
 import { useState } from 'react';
 import Form from 'antd/lib/form';
@@ -109,3 +111,7 @@ export default function CnWordPage() {
     />
   );
 }
+
+export const getServerSideProps: GetServerSideProps<UserSession> = (context) => {
+  return noEditPerm(context);
+};

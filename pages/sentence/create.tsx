@@ -1,4 +1,6 @@
 import { CreateSentenceResp } from '@/lib/backend/paramAndResp';
+import { GetServerSideProps } from 'next';
+import { UserSession, noEditPerm } from '@/lib/backend/noPermInterceptor';
 import { apiUrls } from '@/lib/backend/urls';
 import { btnLayout, formLayout } from '@/lib/frontend/const';
 import { ctrlSAction } from '@/lib/frontend/keydownActions';
@@ -66,7 +68,9 @@ export default function Create() {
     }
   };
 
-  const cleanNote = () => {
+  const cleanFields = () => {
+    const cleanedSentence = sentenceFieldValue.trim().replace(/  +/g, ' ');
+    createSentenceForm.setFieldValue('sentence', cleanedSentence);
     const cleanedNote = noteFieldValue.trim().replace(/  +/g, ' ');
     createSentenceForm.setFieldValue('note', cleanedNote);
   };
@@ -102,8 +106,8 @@ export default function Create() {
               >
                 Submit
               </Button>
-              <Button className={styles.btn} onClick={cleanNote}>
-                Clean Note
+              <Button className={styles.btn} onClick={cleanFields}>
+                Clean Fields
               </Button>
             </Form.Item>
           </Form>
@@ -112,3 +116,7 @@ export default function Create() {
     </EnLayout>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<UserSession> = (context) => {
+  return noEditPerm(context);
+};

@@ -6,7 +6,7 @@ import {
 } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 
-// reference https://github.com/nicejade/markdown2png/blob/master/src/views/Home.vue
+// reference https://github.com/nicejade/markdown2png/blob/master/src/views/Home.vue (demo https://share.lovejade.cn/)
 // TODO: 纸屑样式的纸屑 svg 没有出现在导出图像里，奇怪的是商务样式又正常。原作者也没解决，不得不感慨 html2canvas 真的乐色。只好先搁置了
 
 export enum DarkThemeClassNames {

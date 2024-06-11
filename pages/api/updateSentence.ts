@@ -3,6 +3,7 @@ import { SENTENCE_NOT_FOUND, UPDATE_SENTENCE_EXCEPTION } from '@/lib/retcode';
 import { UpdateSentenceParams } from '@/lib/backend/paramAndResp';
 import { createRouter } from 'next-connect';
 import { fail, suc } from '@/lib/resp';
+import { isAuthorized } from '@/middlewares/isAuthorized';
 import { sentence } from '@/db/models';
 import { sentenceIdValidatorSchema } from '@/lib/backend/paramValidators';
 import { validateReq } from '@/middlewares/validateReq';
@@ -25,6 +26,7 @@ router.post(
       type: 'object'
     }
   }),
+  isAuthorized(),
   async(req, res) => {
     let { id, note, sentence: sentenceData } = req.body;
     id = id.toString().trim();

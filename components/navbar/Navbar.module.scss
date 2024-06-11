@@ -20,16 +20,19 @@
     display: flex;
     align-items: center;
     gap: 24px;
-  }
-
-  .appName {
-    font-size: 18px;
-    font-weight: bold;
-    transition: color .3s;
 
     @include useTheme {
       color: getThemeVar('textColor')
     }
+  }
+
+  .appName {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 18px;
+    font-weight: bold;
+    transition: color .3s;
   }
 
   .selectLang {

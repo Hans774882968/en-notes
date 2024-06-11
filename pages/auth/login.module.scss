@@ -1,0 +1,61 @@
+@import '../../styles/theme.scss';
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @media screen and (min-width: 450px) {
+    .card {
+      margin: 2rem 0;
+      width: 368px
+    }
+  }
+
+  @media screen and (max-width: 450px) {
+    .card {
+      margin: 1rem 0;
+      width: 343px
+    }
+  }
+
+  .card {
+    @include useTheme {
+      border: 2px solid getThemeVar('loginCardBorderColor');
+    }
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 24px;
+    border-radius: 2rem;
+    padding: 1.25rem 2rem;
+
+    .signIn {
+      @include useTheme {
+        background-color: getThemeVar('providerBg');
+        border-color: getThemeVar('providerBorderColor');
+        color: getThemeVar('providerColor');
+      }
+
+      align-items: center;
+      border-radius: 0.5rem;
+      display: flex;
+      font-size: 1.1rem;
+      font-weight: 500;
+      justify-content: center;
+      min-height: 62px;
+      padding: .75rem 1rem;
+      position: relative;
+      transition: all .1s ease-in-out;
+      width: 100%;
+
+      &:hover {
+        @include useTheme {
+          background-color: getThemeVar('providerBgHover');
+        }
+
+        cursor: pointer;
+      }
+    }
+  }
+}

@@ -1,7 +1,9 @@
 import { BelongSentence } from '@/lib/frontend/encDecSentenceInfo';
 import { DEBOUNCE_DEFAULT_OPTION, DEBOUNCE_DEFAULT_TIMEOUT, btnLayout, formLayout } from '@/lib/frontend/const';
 import { GetSentenceResp, SentenceSearchResp, UpdateSentenceResp } from '@/lib/backend/paramAndResp';
+import { GetServerSideProps } from 'next';
 import { Sentence, SentenceIdType, Word } from '@/db/models/types';
+import { UserSession, noEditPerm } from '@/lib/backend/noPermInterceptor';
 import { apiUrls } from '@/lib/backend/urls';
 import { ctrlSAction } from '@/lib/frontend/keydownActions';
 import { useBeforeUnload } from 'react-use';
@@ -204,7 +206,9 @@ export default function Edit() {
     // setSearchResult(() => getSearchResultAfterFinish(editSentenceData));
   };
 
-  const cleanNote = () => {
+  const cleanFields = () => {
+    const cleanedSentence = sentenceFieldValue.trim().replace(/  +/g, ' ');
+    editSentenceForm.setFieldValue('sentence', cleanedSentence);
     const cleanedNote = noteFieldValue.trim().replace(/  +/g, ' ');
     editSentenceForm.setFieldValue('note', cleanedNote);
   };
@@ -270,8 +274,8 @@ export default function Edit() {
               </Button>
               {
                 isUpdateState() && (
-                  <Button className={styles.btn} onClick={cleanNote}>
-                    Clean Note
+                  <Button className={styles.btn} onClick={cleanFields}>
+                    Clean Fields
                   </Button>
                 )
               }
@@ -282,3 +286,7 @@ export default function Edit() {
     </EnLayout>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<UserSession> = (context) => {
+  return noEditPerm(context);
+};

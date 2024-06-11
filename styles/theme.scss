@@ -6,6 +6,11 @@ $themes: (
     linkHoverColor: #69b1ff,
     pageContainerBgColor: #f5f5f5,
     mdEditorModifiedBorderColor: #116329,
+    loginCardBorderColor: #dadde1,
+    providerBg: #24292f,
+    providerBorderColor: rgba(0, 0, 0, .1),
+    providerColor: #fff,
+    providerBgHover: rgba(36, 41, 47, 0.8),
   ),
   dark: (textColor: rgb(255 255 255 / 85%),
     navbarBgColor: #161b22,
@@ -14,6 +19,11 @@ $themes: (
     linkHoverColor: #15417e,
     pageContainerBgColor: black,
     mdEditorModifiedBorderColor: #7ee787,
+    loginCardBorderColor: #30363d,
+    providerBg: #24292f,
+    providerBorderColor: rgba(0, 0, 0, .1),
+    providerColor: #fff,
+    providerBgHover: rgba(36, 41, 47, 0.8),
   )
 );
 

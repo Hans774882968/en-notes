@@ -4,6 +4,8 @@ import { GetSentenceListParams, GetSentenceListResp } from '@/lib/backend/paramA
 import { SENTENCE_COMPLEXITY_INTRO } from '@/lib/frontend/const';
 import { Sentence, SentenceIdType } from '@/db/models/types';
 import { apiUrls } from '@/lib/backend/urls';
+import { loginAsTheGodOfTheGods } from '@/lib/backend/perm';
+import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import Button from 'antd/lib/button';
 import ComplexityTooltip from '@/components/list/ComplexityTooltip';
@@ -50,7 +52,9 @@ export default function List() {
 
   const [cacheSentences, setCacheSentences] = useState<Sentence[]>([]);
 
-  const shouldShowSentenceId = true; // TODO: 添加身份认证
+  const { data: session } = useSession();
+  // 只隐藏字段。接口还是得返回的，否则缺 rowKey
+  const shouldShowSentenceId = loginAsTheGodOfTheGods(session);
 
   const columns = [
     {

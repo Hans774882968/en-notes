@@ -15,8 +15,10 @@ export const urls = {
     list: '/sentence/list'
   },
   word: {
-    edit: '/word/word',
+    edit: '/word/edit',
     list: '/word/list',
     settings: '/word/word-settings'
   }
 };
+
+export const LOGIN_PAGE_URL = '/auth/login';

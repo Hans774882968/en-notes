@@ -3,6 +3,7 @@ import { CreateSentenceParams } from '@/lib/backend/paramAndResp';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createRouter } from 'next-connect';
 import { fail, suc } from '@/lib/resp';
+import { isAuthorized } from '@/middlewares/isAuthorized';
 import { sentence } from '@/db/models';
 import { validateReq } from '@/middlewares/validateReq';
 
@@ -20,6 +21,7 @@ router.post(
       type: 'object'
     }
   }),
+  isAuthorized(),
   async(req, res) => {
     let { note, sentence: sentenceData } = req.body;
     sentenceData = sentenceData.trim();

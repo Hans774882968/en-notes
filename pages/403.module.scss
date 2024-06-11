@@ -1,0 +1,11 @@
+@import '../styles/theme.scss';
+
+.index {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @include useTheme {
+    color: getThemeVar('textColor')
+  }
+}

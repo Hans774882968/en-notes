@@ -1,0 +1,13 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: bold;
+  font-size: 18px;
+
+  .link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
